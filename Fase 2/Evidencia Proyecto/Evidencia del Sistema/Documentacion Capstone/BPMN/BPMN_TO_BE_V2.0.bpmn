@@ -1,0 +1,650 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_TOBE_V2" targetNamespace="https://pmp-suite.local/bpmn">
+  <bpmn:collaboration id="Collaboration_TOBE">
+    <bpmn:participant id="Participant_TOBE" name="Proceso integrado PMP Suite TO-BE" processRef="Process_TOBE_V2" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_TOBE_V2" name="PMP Suite TO-BE — Physical First" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_TOBE_V2">
+      <bpmn:lane id="Lane_Terreno" name="Técnico Terreno">
+        <bpmn:flowNodeRef>Start_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Reportar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_ValidRetiro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_ConfRetiro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Instalar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_InstGate</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Logistica" name="Logística / Bodega">
+        <bpmn:flowNodeRef>TO_RecTerreno</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_SalLab</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_EntregarRep</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_RecLabBod</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_SalQA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_RecQABod</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_DespTerr</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_AsignarRetiro</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_JefeLab" name="Jefe Laboratorio">
+        <bpmn:flowNodeRef>TO_RecLab</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Asignar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_SalidaLab</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_TecLab" name="Técnico Laboratorio">
+        <bpmn:flowNodeRef>TO_Diagnostico</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_RepGate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_SolRep</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Reparar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Pruebas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_TestGate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Cerrar</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_QA" name="QA">
+        <bpmn:flowNodeRef>TO_RecQA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Ambiente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_QAPruebas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Dictamen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_SalidaQA</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Sistema" name="Sistema PMP Suite">
+        <bpmn:flowNodeRef>TO_CasoOS</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_EventoRetiro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_CustBod</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_CicloLab</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_SLA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_CrearSol</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Stock</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Listo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_CicloQA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Elegible</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_CrearIN</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Operacion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_Reingreso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_QAGate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TO_InstFallida</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Retorno</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_TOBE</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_TOBE" name="Falla detectada / requerimiento" />
+    <bpmn:task id="TO_Reportar" name="Reportar falla" />
+    <bpmn:serviceTask id="TO_CasoOS" name="Crear caso y OS" />
+    <bpmn:task id="TO_ValidRetiro" name="Validar identidad del retiro" />
+    <bpmn:task id="TO_ConfRetiro" name="Confirmar retiro físico" />
+    <bpmn:serviceTask id="TO_EventoRetiro" name="Registrar retiro y tránsito" />
+    <bpmn:task id="TO_RecTerreno" name="Validar y confirmar recepción" />
+    <bpmn:serviceTask id="TO_CustBod" name="Registrar custodia Bodega" />
+    <bpmn:task id="TO_SalLab" name="Validar y confirmar salida Lab" />
+    <bpmn:serviceTask id="TO_CicloLab" name="Abrir ciclo Laboratorio" />
+    <bpmn:task id="TO_RecLab" name="Confirmar recepción Lab" />
+    <bpmn:serviceTask id="TO_SLA" name="Iniciar SLA del ciclo" />
+    <bpmn:task id="TO_Asignar" name="Asignar técnico" />
+    <bpmn:task id="TO_Diagnostico" name="Diagnosticar" />
+    <bpmn:exclusiveGateway id="TO_RepGate" name="¿Requiere repuesto?" />
+    <bpmn:task id="TO_SolRep" name="Solicitar necesidad de repuesto" />
+    <bpmn:serviceTask id="TO_CrearSol" name="Crear solicitud / espera" />
+    <bpmn:task id="TO_EntregarRep" name="Entregar repuesto" />
+    <bpmn:serviceTask id="TO_Stock" name="Descontar stock y auditar" />
+    <bpmn:task id="TO_Reparar" name="Intervenciones / reparación" />
+    <bpmn:task id="TO_Pruebas" name="Manual / Test MK" />
+    <bpmn:exclusiveGateway id="TO_TestGate" name="¿Pruebas aprobadas?" />
+    <bpmn:task id="TO_Cerrar" name="Finalizar trabajo técnico" />
+    <bpmn:serviceTask id="TO_Listo" name="Registrar listo para salida" />
+    <bpmn:task id="TO_SalidaLab" name="Validar y confirmar salida Lab" />
+    <bpmn:task id="TO_RecLabBod" name="Confirmar recepción Bodega" />
+    <bpmn:task id="TO_SalQA" name="Validar y confirmar salida QA" />
+    <bpmn:serviceTask id="TO_CicloQA" name="Abrir ciclo QA" />
+    <bpmn:task id="TO_RecQA" name="Confirmar recepción QA" />
+    <bpmn:task id="TO_Ambiente" name="Instalación Ambiente" />
+    <bpmn:task id="TO_QAPruebas" name="Pruebas QA" />
+    <bpmn:task id="TO_Dictamen" name="Registrar dictamen" />
+    <bpmn:exclusiveGateway id="TO_QAGate" name="¿Operativo?" />
+    <bpmn:task id="TO_SalidaQA" name="Validar y confirmar salida QA" />
+    <bpmn:task id="TO_RecQABod" name="Confirmar recepción Bodega" />
+    <bpmn:serviceTask id="TO_Elegible" name="Evaluar elegibilidad de stock" />
+    <bpmn:task id="TO_DespTerr" name="Validar y confirmar despacho Terreno" />
+    <bpmn:serviceTask id="TO_CrearIN" name="Crear IN + SALIDA_BODEGA_TERRENO" />
+    <bpmn:task id="TO_Instalar" name="Confirmar resultado de instalación" />
+    <bpmn:serviceTask id="TO_Operacion" name="Registrar activo en operación" />
+    <bpmn:endEvent id="End_TOBE" name="Activo en operación" />
+    <bpmn:serviceTask id="TO_Reingreso" name="Preparar reingreso a Laboratorio" />
+    <bpmn:sequenceFlow id="T1" sourceRef="Start_TOBE" targetRef="TO_Reportar" />
+    <bpmn:sequenceFlow id="T2" sourceRef="TO_Reportar" targetRef="TO_CasoOS" />
+    <bpmn:sequenceFlow id="T3" sourceRef="TO_CasoOS" targetRef="TO_AsignarRetiro" />
+    <bpmn:sequenceFlow id="T4" sourceRef="TO_ValidRetiro" targetRef="TO_ConfRetiro" />
+    <bpmn:sequenceFlow id="T5" sourceRef="TO_ConfRetiro" targetRef="TO_EventoRetiro" />
+    <bpmn:sequenceFlow id="T6" sourceRef="TO_EventoRetiro" targetRef="TO_RecTerreno" />
+    <bpmn:sequenceFlow id="T7" sourceRef="TO_RecTerreno" targetRef="TO_CustBod" />
+    <bpmn:sequenceFlow id="T8" sourceRef="TO_CustBod" targetRef="TO_SalLab" />
+    <bpmn:sequenceFlow id="T9" sourceRef="TO_SalLab" targetRef="TO_CicloLab" />
+    <bpmn:sequenceFlow id="T10" sourceRef="TO_CicloLab" targetRef="TO_RecLab" />
+    <bpmn:sequenceFlow id="T11" sourceRef="TO_RecLab" targetRef="TO_SLA" />
+    <bpmn:sequenceFlow id="T12" sourceRef="TO_SLA" targetRef="TO_Asignar" />
+    <bpmn:sequenceFlow id="T13" sourceRef="TO_Asignar" targetRef="TO_Diagnostico" />
+    <bpmn:sequenceFlow id="T14" sourceRef="TO_Diagnostico" targetRef="TO_RepGate" />
+    <bpmn:sequenceFlow id="T15" name="No" sourceRef="TO_RepGate" targetRef="TO_Reparar" />
+    <bpmn:sequenceFlow id="T16" name="Sí" sourceRef="TO_RepGate" targetRef="TO_SolRep" />
+    <bpmn:sequenceFlow id="T17" sourceRef="TO_SolRep" targetRef="TO_CrearSol" />
+    <bpmn:sequenceFlow id="T18" sourceRef="TO_CrearSol" targetRef="TO_EntregarRep" />
+    <bpmn:sequenceFlow id="T19" sourceRef="TO_EntregarRep" targetRef="TO_Stock" />
+    <bpmn:sequenceFlow id="T20" sourceRef="TO_Stock" targetRef="TO_Reparar" />
+    <bpmn:sequenceFlow id="T21" sourceRef="TO_Reparar" targetRef="TO_Pruebas" />
+    <bpmn:sequenceFlow id="T22" sourceRef="TO_Pruebas" targetRef="TO_TestGate" />
+    <bpmn:sequenceFlow id="T23" name="Sí" sourceRef="TO_TestGate" targetRef="TO_Cerrar" />
+    <bpmn:sequenceFlow id="T24" name="No / corregir" sourceRef="TO_TestGate" targetRef="TO_Reparar" />
+    <bpmn:sequenceFlow id="T25" sourceRef="TO_Cerrar" targetRef="TO_Listo" />
+    <bpmn:sequenceFlow id="T26" sourceRef="TO_Listo" targetRef="TO_SalidaLab" />
+    <bpmn:sequenceFlow id="T27" sourceRef="TO_SalidaLab" targetRef="TO_RecLabBod" />
+    <bpmn:sequenceFlow id="T28" sourceRef="TO_RecLabBod" targetRef="TO_SalQA" />
+    <bpmn:sequenceFlow id="T29" sourceRef="TO_SalQA" targetRef="TO_CicloQA" />
+    <bpmn:sequenceFlow id="T30" sourceRef="TO_CicloQA" targetRef="TO_RecQA" />
+    <bpmn:sequenceFlow id="T31" sourceRef="TO_RecQA" targetRef="TO_Ambiente" />
+    <bpmn:sequenceFlow id="T32" sourceRef="TO_Ambiente" targetRef="TO_QAPruebas" />
+    <bpmn:sequenceFlow id="T33" sourceRef="TO_QAPruebas" targetRef="TO_Dictamen" />
+    <bpmn:sequenceFlow id="T34" sourceRef="TO_Dictamen" targetRef="TO_SalidaQA" />
+    <bpmn:sequenceFlow id="T35" name="Operativo" sourceRef="TO_QAGate" targetRef="TO_Elegible" />
+    <bpmn:sequenceFlow id="T36" sourceRef="TO_SalidaQA" targetRef="TO_RecQABod" />
+    <bpmn:sequenceFlow id="T37" sourceRef="TO_RecQABod" targetRef="TO_QAGate" />
+    <bpmn:sequenceFlow id="T38" sourceRef="TO_Elegible" targetRef="TO_DespTerr" />
+    <bpmn:sequenceFlow id="T39" sourceRef="TO_DespTerr" targetRef="TO_CrearIN" />
+    <bpmn:sequenceFlow id="T40" sourceRef="TO_CrearIN" targetRef="TO_Instalar" />
+    <bpmn:sequenceFlow id="T41" sourceRef="TO_Instalar" targetRef="TO_InstGate" />
+    <bpmn:sequenceFlow id="T42" sourceRef="TO_Operacion" targetRef="End_TOBE" />
+    <bpmn:sequenceFlow id="T43" name="Rechazado" sourceRef="TO_QAGate" targetRef="TO_Reingreso" />
+    <bpmn:sequenceFlow id="T44" name="Nuevo ciclo vía Bodega" sourceRef="TO_Reingreso" targetRef="TO_SalLab" />
+    <bpmn:task id="TO_AsignarRetiro" name="Asignar retiro a técnico Terreno" />
+    <bpmn:sequenceFlow id="T45" sourceRef="TO_AsignarRetiro" targetRef="TO_ValidRetiro" />
+    <bpmn:exclusiveGateway id="TO_InstGate" name="¿Instalado OK?" />
+    <bpmn:serviceTask id="TO_InstFallida" name="Registrar instalación fallida; estado 11" />
+    <bpmn:endEvent id="End_Retorno" name="Retorno a Bodega pendiente" />
+    <bpmn:sequenceFlow id="T46" sourceRef="TO_InstGate" targetRef="TO_Operacion" name="Sí" />
+    <bpmn:sequenceFlow id="T47" sourceRef="TO_InstGate" targetRef="TO_InstFallida" name="No" />
+    <bpmn:sequenceFlow id="T48" sourceRef="TO_InstFallida" targetRef="End_Retorno" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_TOBE_V2">
+    <bpmndi:BPMNPlane id="Plane_TOBE_V2" bpmnElement="Collaboration_TOBE">
+      <bpmndi:BPMNShape id="Participant_TOBE_di" bpmnElement="Participant_TOBE" isHorizontal="true">
+        <dc:Bounds x="40" y="80" width="8010" height="1030" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Terreno_di" bpmnElement="Lane_Terreno" isHorizontal="true">
+        <dc:Bounds x="80" y="80" width="7970" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Logistica_di" bpmnElement="Lane_Logistica" isHorizontal="true">
+        <dc:Bounds x="80" y="230" width="7970" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_JefeLab_di" bpmnElement="Lane_JefeLab" isHorizontal="true">
+        <dc:Bounds x="80" y="380" width="7970" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_TecLab_di" bpmnElement="Lane_TecLab" isHorizontal="true">
+        <dc:Bounds x="80" y="530" width="7970" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_QA_di" bpmnElement="Lane_QA" isHorizontal="true">
+        <dc:Bounds x="80" y="680" width="7970" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Sistema_di" bpmnElement="Lane_Sistema" isHorizontal="true">
+        <dc:Bounds x="80" y="830" width="7970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_TOBE_di" bpmnElement="Start_TOBE">
+        <dc:Bounds x="150" y="120" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Reportar_di" bpmnElement="TO_Reportar">
+        <dc:Bounds x="340" y="120" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_CasoOS_di" bpmnElement="TO_CasoOS">
+        <dc:Bounds x="530" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_ValidRetiro_di" bpmnElement="TO_ValidRetiro">
+        <dc:Bounds x="910" y="120" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_ConfRetiro_di" bpmnElement="TO_ConfRetiro">
+        <dc:Bounds x="1100" y="120" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_EventoRetiro_di" bpmnElement="TO_EventoRetiro">
+        <dc:Bounds x="1290" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_RecTerreno_di" bpmnElement="TO_RecTerreno">
+        <dc:Bounds x="1480" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_CustBod_di" bpmnElement="TO_CustBod">
+        <dc:Bounds x="1670" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_SalLab_di" bpmnElement="TO_SalLab">
+        <dc:Bounds x="1860" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_CicloLab_di" bpmnElement="TO_CicloLab">
+        <dc:Bounds x="2050" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_RecLab_di" bpmnElement="TO_RecLab">
+        <dc:Bounds x="2240" y="420" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_SLA_di" bpmnElement="TO_SLA">
+        <dc:Bounds x="2430" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Asignar_di" bpmnElement="TO_Asignar">
+        <dc:Bounds x="2620" y="420" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Diagnostico_di" bpmnElement="TO_Diagnostico">
+        <dc:Bounds x="2810" y="570" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_RepGate_di" bpmnElement="TO_RepGate" isMarkerVisible="true">
+        <dc:Bounds x="3000" y="570" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2970" y="535" width="120" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_SolRep_di" bpmnElement="TO_SolRep">
+        <dc:Bounds x="3190" y="570" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_CrearSol_di" bpmnElement="TO_CrearSol">
+        <dc:Bounds x="3380" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_EntregarRep_di" bpmnElement="TO_EntregarRep">
+        <dc:Bounds x="3570" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Stock_di" bpmnElement="TO_Stock">
+        <dc:Bounds x="3760" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Reparar_di" bpmnElement="TO_Reparar">
+        <dc:Bounds x="3950" y="570" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Pruebas_di" bpmnElement="TO_Pruebas">
+        <dc:Bounds x="4140" y="570" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_TestGate_di" bpmnElement="TO_TestGate" isMarkerVisible="true">
+        <dc:Bounds x="4330" y="570" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4290" y="535" width="140" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Cerrar_di" bpmnElement="TO_Cerrar">
+        <dc:Bounds x="4520" y="570" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Listo_di" bpmnElement="TO_Listo">
+        <dc:Bounds x="4710" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_SalidaLab_di" bpmnElement="TO_SalidaLab">
+        <dc:Bounds x="4900" y="420" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_RecLabBod_di" bpmnElement="TO_RecLabBod">
+        <dc:Bounds x="5090" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_SalQA_di" bpmnElement="TO_SalQA">
+        <dc:Bounds x="5280" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_CicloQA_di" bpmnElement="TO_CicloQA">
+        <dc:Bounds x="5470" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_RecQA_di" bpmnElement="TO_RecQA">
+        <dc:Bounds x="5660" y="720" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Ambiente_di" bpmnElement="TO_Ambiente">
+        <dc:Bounds x="5850" y="720" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_QAPruebas_di" bpmnElement="TO_QAPruebas">
+        <dc:Bounds x="6040" y="720" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Dictamen_di" bpmnElement="TO_Dictamen">
+        <dc:Bounds x="6230" y="720" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_QAGate_di" bpmnElement="TO_QAGate" isMarkerVisible="true">
+        <dc:Bounds x="6800" y="870" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="6850" y="945" width="105" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_SalidaQA_di" bpmnElement="TO_SalidaQA">
+        <dc:Bounds x="6420" y="720" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_RecQABod_di" bpmnElement="TO_RecQABod">
+        <dc:Bounds x="6610" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Elegible_di" bpmnElement="TO_Elegible">
+        <dc:Bounds x="6990" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_DespTerr_di" bpmnElement="TO_DespTerr">
+        <dc:Bounds x="7180" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_CrearIN_di" bpmnElement="TO_CrearIN">
+        <dc:Bounds x="7370" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Instalar_di" bpmnElement="TO_Instalar">
+        <dc:Bounds x="7560" y="120" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Operacion_di" bpmnElement="TO_Operacion">
+        <dc:Bounds x="7750" y="870" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_TOBE_di" bpmnElement="End_TOBE">
+        <dc:Bounds x="7825" y="975" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="7705" y="967" width="110" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_Reingreso_di" bpmnElement="TO_Reingreso">
+        <dc:Bounds x="6990" y="990" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="T1_di" bpmnElement="T1">
+        <di:waypoint x="186.0" y="138.0" />
+        <di:waypoint x="206.0" y="138.0" />
+        <di:waypoint x="206.0" y="157.5" />
+        <di:waypoint x="340.0" y="157.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T2_di" bpmnElement="T2">
+        <di:waypoint x="490.0" y="157.5" />
+        <di:waypoint x="510.0" y="157.5" />
+        <di:waypoint x="510.0" y="907.5" />
+        <di:waypoint x="530.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T3_di" bpmnElement="T3">
+        <di:waypoint x="680.0" y="907.5" />
+        <di:waypoint x="700.0" y="907.5" />
+        <di:waypoint x="700.0" y="307.5" />
+        <di:waypoint x="720.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T4_di" bpmnElement="T4">
+        <di:waypoint x="1060.0" y="157.5" />
+        <di:waypoint x="1080.0" y="157.5" />
+        <di:waypoint x="1080.0" y="157.5" />
+        <di:waypoint x="1100.0" y="157.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T5_di" bpmnElement="T5">
+        <di:waypoint x="1250.0" y="157.5" />
+        <di:waypoint x="1270.0" y="157.5" />
+        <di:waypoint x="1270.0" y="907.5" />
+        <di:waypoint x="1290.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T6_di" bpmnElement="T6">
+        <di:waypoint x="1440.0" y="907.5" />
+        <di:waypoint x="1460.0" y="907.5" />
+        <di:waypoint x="1460.0" y="307.5" />
+        <di:waypoint x="1480.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T7_di" bpmnElement="T7">
+        <di:waypoint x="1630.0" y="307.5" />
+        <di:waypoint x="1650.0" y="307.5" />
+        <di:waypoint x="1650.0" y="907.5" />
+        <di:waypoint x="1670.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T8_di" bpmnElement="T8">
+        <di:waypoint x="1820.0" y="907.5" />
+        <di:waypoint x="1840.0" y="907.5" />
+        <di:waypoint x="1840.0" y="307.5" />
+        <di:waypoint x="1860.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T9_di" bpmnElement="T9">
+        <di:waypoint x="2010.0" y="307.5" />
+        <di:waypoint x="2030.0" y="307.5" />
+        <di:waypoint x="2030.0" y="907.5" />
+        <di:waypoint x="2050.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T10_di" bpmnElement="T10">
+        <di:waypoint x="2200.0" y="907.5" />
+        <di:waypoint x="2220.0" y="907.5" />
+        <di:waypoint x="2220.0" y="457.5" />
+        <di:waypoint x="2240.0" y="457.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T11_di" bpmnElement="T11">
+        <di:waypoint x="2390.0" y="457.5" />
+        <di:waypoint x="2410.0" y="457.5" />
+        <di:waypoint x="2410.0" y="907.5" />
+        <di:waypoint x="2430.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T12_di" bpmnElement="T12">
+        <di:waypoint x="2580.0" y="907.5" />
+        <di:waypoint x="2600.0" y="907.5" />
+        <di:waypoint x="2600.0" y="457.5" />
+        <di:waypoint x="2620.0" y="457.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T13_di" bpmnElement="T13">
+        <di:waypoint x="2770.0" y="457.5" />
+        <di:waypoint x="2790.0" y="457.5" />
+        <di:waypoint x="2790.0" y="607.5" />
+        <di:waypoint x="2810.0" y="607.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T14_di" bpmnElement="T14">
+        <di:waypoint x="2960.0" y="607.5" />
+        <di:waypoint x="2980.0" y="607.5" />
+        <di:waypoint x="2980.0" y="595.0" />
+        <di:waypoint x="3000.0" y="595.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T15_di" bpmnElement="T15">
+        <di:waypoint x="3025" y="620" />
+        <di:waypoint x="3025" y="655" />
+        <di:waypoint x="3920" y="655" />
+        <di:waypoint x="3920" y="607.5" />
+        <di:waypoint x="3950" y="607.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3060" y="628" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T16_di" bpmnElement="T16">
+        <di:waypoint x="3050" y="595" />
+        <di:waypoint x="3070" y="595" />
+        <di:waypoint x="3070" y="607.5" />
+        <di:waypoint x="3190" y="607.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3100" y="575" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T17_di" bpmnElement="T17">
+        <di:waypoint x="3340.0" y="607.5" />
+        <di:waypoint x="3360.0" y="607.5" />
+        <di:waypoint x="3360.0" y="907.5" />
+        <di:waypoint x="3380.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T18_di" bpmnElement="T18">
+        <di:waypoint x="3530.0" y="907.5" />
+        <di:waypoint x="3550.0" y="907.5" />
+        <di:waypoint x="3550.0" y="307.5" />
+        <di:waypoint x="3570.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T19_di" bpmnElement="T19">
+        <di:waypoint x="3720.0" y="307.5" />
+        <di:waypoint x="3740.0" y="307.5" />
+        <di:waypoint x="3740.0" y="907.5" />
+        <di:waypoint x="3760.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T20_di" bpmnElement="T20">
+        <di:waypoint x="3910.0" y="907.5" />
+        <di:waypoint x="3930.0" y="907.5" />
+        <di:waypoint x="3930.0" y="607.5" />
+        <di:waypoint x="3950.0" y="607.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T21_di" bpmnElement="T21">
+        <di:waypoint x="4100.0" y="607.5" />
+        <di:waypoint x="4120.0" y="607.5" />
+        <di:waypoint x="4120.0" y="607.5" />
+        <di:waypoint x="4140.0" y="607.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T22_di" bpmnElement="T22">
+        <di:waypoint x="4290.0" y="607.5" />
+        <di:waypoint x="4310.0" y="607.5" />
+        <di:waypoint x="4310.0" y="595.0" />
+        <di:waypoint x="4330.0" y="595.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T23_di" bpmnElement="T23">
+        <di:waypoint x="4380.0" y="595.0" />
+        <di:waypoint x="4400.0" y="595.0" />
+        <di:waypoint x="4400.0" y="607.5" />
+        <di:waypoint x="4520.0" y="607.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T24_di" bpmnElement="T24">
+        <di:waypoint x="4355" y="620" />
+        <di:waypoint x="4355" y="665" />
+        <di:waypoint x="4025" y="665" />
+        <di:waypoint x="4025" y="645" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4150" y="685" width="130" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T25_di" bpmnElement="T25">
+        <di:waypoint x="4670.0" y="607.5" />
+        <di:waypoint x="4690.0" y="607.5" />
+        <di:waypoint x="4690.0" y="907.5" />
+        <di:waypoint x="4710.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T26_di" bpmnElement="T26">
+        <di:waypoint x="4860.0" y="907.5" />
+        <di:waypoint x="4880.0" y="907.5" />
+        <di:waypoint x="4880.0" y="457.5" />
+        <di:waypoint x="4900.0" y="457.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T27_di" bpmnElement="T27">
+        <di:waypoint x="5050.0" y="457.5" />
+        <di:waypoint x="5070.0" y="457.5" />
+        <di:waypoint x="5070.0" y="307.5" />
+        <di:waypoint x="5090.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T28_di" bpmnElement="T28">
+        <di:waypoint x="5240.0" y="307.5" />
+        <di:waypoint x="5260.0" y="307.5" />
+        <di:waypoint x="5260.0" y="307.5" />
+        <di:waypoint x="5280.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T29_di" bpmnElement="T29">
+        <di:waypoint x="5430.0" y="307.5" />
+        <di:waypoint x="5450.0" y="307.5" />
+        <di:waypoint x="5450.0" y="907.5" />
+        <di:waypoint x="5470.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T30_di" bpmnElement="T30">
+        <di:waypoint x="5620.0" y="907.5" />
+        <di:waypoint x="5640.0" y="907.5" />
+        <di:waypoint x="5640.0" y="757.5" />
+        <di:waypoint x="5660.0" y="757.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T31_di" bpmnElement="T31">
+        <di:waypoint x="5810.0" y="757.5" />
+        <di:waypoint x="5830.0" y="757.5" />
+        <di:waypoint x="5830.0" y="757.5" />
+        <di:waypoint x="5850.0" y="757.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T32_di" bpmnElement="T32">
+        <di:waypoint x="6000.0" y="757.5" />
+        <di:waypoint x="6020.0" y="757.5" />
+        <di:waypoint x="6020.0" y="757.5" />
+        <di:waypoint x="6040.0" y="757.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T33_di" bpmnElement="T33">
+        <di:waypoint x="6190.0" y="757.5" />
+        <di:waypoint x="6210.0" y="757.5" />
+        <di:waypoint x="6210.0" y="757.5" />
+        <di:waypoint x="6230.0" y="757.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T34_di" bpmnElement="T34">
+        <di:waypoint x="6380.0" y="757.5" />
+        <di:waypoint x="6400.0" y="757.5" />
+        <di:waypoint x="6400.0" y="757.5" />
+        <di:waypoint x="6420.0" y="757.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T35_di" bpmnElement="T35">
+        <di:waypoint x="6850" y="895" />
+        <di:waypoint x="6870" y="895" />
+        <di:waypoint x="6870" y="907.5" />
+        <di:waypoint x="6990" y="907.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="6878" y="875" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T36_di" bpmnElement="T36">
+        <di:waypoint x="6570.0" y="757.5" />
+        <di:waypoint x="6590.0" y="757.5" />
+        <di:waypoint x="6590.0" y="307.5" />
+        <di:waypoint x="6610.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T37_di" bpmnElement="T37">
+        <di:waypoint x="6760.0" y="307.5" />
+        <di:waypoint x="6780.0" y="307.5" />
+        <di:waypoint x="6780.0" y="895.0" />
+        <di:waypoint x="6800.0" y="895.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T38_di" bpmnElement="T38">
+        <di:waypoint x="7140.0" y="907.5" />
+        <di:waypoint x="7160.0" y="907.5" />
+        <di:waypoint x="7160.0" y="307.5" />
+        <di:waypoint x="7180.0" y="307.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T39_di" bpmnElement="T39">
+        <di:waypoint x="7330.0" y="307.5" />
+        <di:waypoint x="7350.0" y="307.5" />
+        <di:waypoint x="7350.0" y="907.5" />
+        <di:waypoint x="7370.0" y="907.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T40_di" bpmnElement="T40">
+        <di:waypoint x="7520.0" y="907.5" />
+        <di:waypoint x="7540.0" y="907.5" />
+        <di:waypoint x="7540.0" y="157.5" />
+        <di:waypoint x="7560.0" y="157.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T41_di" bpmnElement="T41">
+        <di:waypoint x="7710" y="157.5" />
+        <di:waypoint x="7750" y="157.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T42_di" bpmnElement="T42">
+        <di:waypoint x="7843" y="945" />
+        <di:waypoint x="7843" y="975" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T43_di" bpmnElement="T43">
+        <di:waypoint x="6825" y="920" />
+        <di:waypoint x="6825" y="1027.5" />
+        <di:waypoint x="6990" y="1027.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="6840" y="998" width="95" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T44_di" bpmnElement="T44">
+        <di:waypoint x="7065" y="1065" />
+        <di:waypoint x="7065" y="1090" />
+        <di:waypoint x="1840" y="1090" />
+        <di:waypoint x="1840" y="307.5" />
+        <di:waypoint x="1860" y="307.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4000" y="1062" width="170" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TO_AsignarRetiro_di" bpmnElement="TO_AsignarRetiro">
+        <dc:Bounds x="720" y="270" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="T45_di" bpmnElement="T45">
+        <di:waypoint x="870.0" y="307.5" />
+        <di:waypoint x="890.0" y="307.5" />
+        <di:waypoint x="890.0" y="157.5" />
+        <di:waypoint x="910.0" y="157.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TO_InstGate_di" bpmnElement="TO_InstGate" isMarkerVisible="true">
+        <dc:Bounds x="7750" y="132" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="7735" y="90" width="110" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TO_InstFallida_di" bpmnElement="TO_InstFallida">
+        <dc:Bounds x="7560" y="990" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Retorno_di" bpmnElement="End_Retorno">
+        <dc:Bounds x="7370" y="1009" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="7325" y="1053" width="130" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="T46_di" bpmnElement="T46">
+        <di:waypoint x="7775" y="182" />
+        <di:waypoint x="7775" y="850" />
+        <di:waypoint x="7825" y="850" />
+        <di:waypoint x="7825" y="870" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="7785" y="235" width="30" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T47_di" bpmnElement="T47">
+        <di:waypoint x="7800" y="157" />
+        <di:waypoint x="7920" y="157" />
+        <di:waypoint x="7920" y="1027.5" />
+        <di:waypoint x="7710" y="1027.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="7930" y="235" width="30" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="T48_di" bpmnElement="T48">
+        <di:waypoint x="7560" y="1027.5" />
+        <di:waypoint x="7406" y="1027.5" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

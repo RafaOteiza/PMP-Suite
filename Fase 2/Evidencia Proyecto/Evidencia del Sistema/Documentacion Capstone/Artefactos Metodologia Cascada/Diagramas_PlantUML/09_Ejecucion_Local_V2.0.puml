@@ -1,0 +1,28 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+node "PC desarrollo" {
+  component "Vite :5173" as WEB
+  component "Node API :4000" as API
+  database "PostgreSQL :5432\npmp_suite" as DB
+  component "Python IA" as PY
+  component "Metro / Expo" as EXPO
+}
+cloud Firebase
+node "Teléfono" {
+  component "Cliente PMP compatible\ncon Expo SDK 57" as MOB
+}
+WEB --> Firebase : autenticación
+MOB --> Firebase : autenticación
+WEB --> API : Bearer
+API --> DB
+API --> Firebase
+API --> PY
+PY --> DB
+EXPO --> MOB
+MOB --> API : LAN
+@enduml

@@ -1,0 +1,12 @@
+/* Admin/Jefatura composition, using the existing PMP tokens and density. */
+.executive-process-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4,16px);margin-block:var(--space-4,16px)}
+.executive-context{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:16px;font-size:13px}
+.process-summary dl{margin:8px 0 0}.process-summary dl>div{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border-subtle);padding:8px 0}
+.process-summary dt{min-width:0}.process-summary dt a{display:inline-flex;align-items:center;gap:8px;min-height:32px}.process-summary dd{margin:0;flex-shrink:0}
+.lab-reception .reception-table{width:100%;table-layout:fixed}.lab-reception .reception-table th:first-child{width:20%}.lab-reception .reception-table th:nth-child(2){width:25%}
+.lab-reception .reception-table :is(td,th){overflow-wrap:anywhere}.lab-reception .reception-table .btn{white-space:normal}.lab-reception .status-badge{white-space:normal}
+@media(max-width:767px){.executive-process-grid{grid-template-columns:1fr}.lab-reception .reception-table{display:block}.lab-reception .asset-pagination{flex-wrap:wrap}.lab-reception .page-header-actions{flex-wrap:wrap}}
+
+
+.admin-workspace .executive-context .status-badge{white-space:normal;max-width:100%;line-height:1.4}.admin-workspace .lab-role-dashboard{min-width:0}.admin-workspace .lab-role-dashboard .section-heading{flex-wrap:wrap}
+.admin-workspace .ai-risk-header{flex-wrap:wrap}.admin-workspace .ai-risk-heading{flex:1 1 220px;min-width:0}.admin-workspace .ai-risk-icon{flex-shrink:0}.admin-workspace .ai-risk-device>div:last-child{min-width:0;overflow-wrap:anywhere}.admin-workspace .ai-risk-header .skeleton{max-width:100%}

@@ -1,0 +1,37 @@
+/* Scoped to Despacho por escaneo. Sidebar and other operational views are unchanged. */
+.app-content .dispatch-scan-page { width: 100%; max-width: none; margin-inline: 0; min-width: 0; }
+.dispatch-scan-page .dispatch-scan-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: var(--space-5); align-items: start; }
+.app-content .dispatch-scan-page .operation-section { min-width: 0; margin: 0; }
+.app-content .dispatch-scan-page .operation-form { gap: var(--space-5); }
+.dispatch-scan-page .dispatch-section-heading { display: grid; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border); }
+.dispatch-scan-page .dispatch-section-heading h2 { margin: 0; font-size: var(--text-lg); line-height: 1.4; color: var(--text-main); }
+.dispatch-scan-page .dispatch-section-heading p { margin: 0; }
+.dispatch-scan-page .form-grid { grid-template-columns: minmax(0,1fr); }
+.dispatch-scan-page .field { min-width: 0; }
+.dispatch-scan-page :is(input:not([type="checkbox"]),select,textarea) { width: 100%; }
+.dispatch-scan-page .dispatch-physical .form-section { display: grid; gap: var(--space-4); }
+.dispatch-scan-page .dispatch-physical form { min-width: 0; }
+.dispatch-scan-page .dispatch-physical label:has(input[type="checkbox"]) { display: flex; align-items: flex-start; gap: var(--space-2); line-height: 1.5; }
+.dispatch-scan-page .dispatch-physical input[type="checkbox"] { flex: 0 0 auto; margin-top: 4px; }
+.dispatch-scan-page .dispatch-contract { padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--panel-2); }
+.dispatch-scan-page .scan-result { min-width: 0; margin: 0; }
+.dispatch-scan-page .scan-details { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.dispatch-scan-page .scan-details dd { overflow-wrap: anywhere; }
+.dispatch-scan-page .dispatch-confirmation { display: grid; gap: var(--space-3); padding-top: var(--space-5); border-top: 1px solid var(--border); }
+.dispatch-scan-page .dispatch-confirmation h3 { margin: 0; font-size: var(--text-md); color: var(--text-main); }
+.dispatch-scan-page .dispatch-confirmation p { margin: 0; }
+.dispatch-scan-page .btn { white-space: normal; overflow-wrap: anywhere; }
+@media (min-width: 1024px) {
+  .dispatch-scan-page .dispatch-scan-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+}
+@media (min-width: 1280px) {
+  .dispatch-scan-page .dispatch-context .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dispatch-scan-page .dispatch-contract { grid-column: 1 / -1; }
+}
+@media (max-width: 1023px) {
+  .dispatch-scan-page .toolbar-group { flex-direction: column; align-items: stretch; }
+  .dispatch-scan-page .btn { width: 100%; }
+}
+@media (max-width: 420px) {
+  .dispatch-scan-page .scan-details { grid-template-columns: minmax(0,1fr); }
+}

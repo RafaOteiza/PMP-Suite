@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="250" viewBox="0 0 900 250"><g transform="translate(15 12) scale(.92)"><g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M36 128V70L72 31H164L175 49H238" stroke="#FFFFFF" stroke-width="18"/>
+      <path d="M238 49H254" stroke="#FFFFFF" stroke-width="32"/>
+      <circle cx="197" cy="49" r="6" fill="#E5E7EB" stroke="none"/><circle cx="222" cy="49" r="6" fill="#E5E7EB" stroke="none"/><circle cx="247" cy="49" r="6" fill="#00B4B0" stroke="none"/>
+      <path d="M36 144V184Q36 202 54 202H166" stroke="#1565C0" stroke-width="18"/>
+      <path d="M166 202H222L252 169V151" stroke="#00B4B0" stroke-width="18"/>
+      <path d="M37 143L78 116H145" stroke="#1565C0" stroke-width="10"/>
+      <path d="M145 116H188" stroke="#00B4B0" stroke-width="10"/>
+      <path d="M188 116L233 106" stroke="#E5E7EB" stroke-width="10"/>
+      <circle cx="86" cy="116" r="19" fill="#FFFFFF" stroke="#1565C0" stroke-width="10"/>
+      <circle cx="174" cy="116" r="19" fill="#FFFFFF" stroke="#00B4B0" stroke-width="10"/>
+      <circle cx="249" cy="102" r="19" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="10"/>
+      <path d="M162 202L181 183" stroke="#FFFFFF" stroke-width="8"/>
+    </g></g><g transform="translate(310 42)"><g font-family="Inter, Arial, Helvetica, sans-serif">
+      <text x="0" y="100" fill="#FFFFFF" font-size="96" font-weight="800" letter-spacing="1">PMP</text>
+      <text x="238" y="100" fill="#1565C0" font-size="91" font-weight="400">Suite</text>
+    </g><text x="2" y="138" fill="#E5E7EB" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="600" letter-spacing="5">CONTROL. MAINTAIN. MOVE FORWARD.</text></g></svg>

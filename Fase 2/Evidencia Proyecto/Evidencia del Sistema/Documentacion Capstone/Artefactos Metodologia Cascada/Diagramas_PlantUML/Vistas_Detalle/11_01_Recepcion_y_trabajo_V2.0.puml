@@ -1,0 +1,22 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+start
+:Salida confirmada de Bodega hacia Lab;
+:En tránsito; sin asignación ni SLA;
+:Jefe Lab valida llegada;
+if (¿Recepción confirmada?) then (Sí)
+ :Custodia Lab e inicio SLA del ciclo;
+ :Jefe Lab asigna técnico;
+ :Trabajo propio, diagnóstico y pruebas;
+ :Cierre técnico;
+ :Salida Lab confirmada hacia Bodega;
+else (No)
+ :Permanece en tránsito;
+endif
+stop
+@enduml

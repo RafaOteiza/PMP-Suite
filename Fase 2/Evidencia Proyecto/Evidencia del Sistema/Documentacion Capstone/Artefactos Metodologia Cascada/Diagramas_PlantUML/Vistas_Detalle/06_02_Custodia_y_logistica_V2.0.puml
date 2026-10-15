@@ -1,0 +1,44 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+left to right direction
+actor "Jefe Laboratorio" as JL
+actor Logistica
+actor QA
+rectangle "PMP Suite V2.0" {
+ usecase "Registrar / recibir activo inicial" as U03
+ usecase "Crear requerimiento / caso" as U04
+ usecase "Asignar retiro" as U05
+ usecase "Recepcionar / despachar en Bodega" as U07
+ usecase "Gestionar inventario / repuestos" as U08
+ usecase "Recepcionar Laboratorio" as U09
+ usecase "Asignar carga Lab" as U10
+ usecase "Despachar Laboratorio" as U13
+ usecase "Recibir / ejecutar QA" as U14
+ usecase "Dictaminar QA" as U15
+ usecase "Despachar QA" as U16
+ usecase "Despachar instalación / crear IN" as U17
+ usecase "Correlacionar referencia externa" as U20
+}
+Logistica --> U03
+Logistica --> U04
+Logistica --> U05
+Logistica --> U07
+Logistica --> U08
+Logistica --> U17
+Logistica --> U20
+JL --> U09
+JL --> U10
+JL --> U13
+QA --> U14
+QA --> U15
+QA --> U16
+legend bottom
+Consultar y exportar no habilita movimientos.
+Aplican autorización y alcance vigentes.
+endlegend
+@enduml

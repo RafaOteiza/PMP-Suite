@@ -1,0 +1,70 @@
+# 07 — Clases conceptuales
+
+```plantuml
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+class Usuario {
+  id
+  correo
+  rol
+  activo
+}
+class Activo {
+  tipo
+  serie
+  modelo
+  marca
+}
+class Caso {
+  codigo
+  origen
+  referenciaExterna
+}
+class OrdenServicio {
+  codigoOS
+  falla
+  estado
+}
+class Evento {
+  tipo
+  fecha
+  metadata
+}
+class EvidenciaFisica {
+  estacion
+  resultado
+  fecha
+}
+class Reparacion
+class SolicitudRepuesto
+class ReferenciaBridge
+
+Caso "0..1" -- "0..*" OrdenServicio
+Activo "1" -- "0..*" OrdenServicio
+OrdenServicio "0..1" -- "0..*" Evento
+OrdenServicio "0..1" -- "0..*" EvidenciaFisica
+OrdenServicio "1" -- "0..*" Reparacion
+OrdenServicio "1" -- "0..*" SolicitudRepuesto
+OrdenServicio "1" -- "0..*" ReferenciaBridge
+Usuario "0..1" -- "0..*" OrdenServicio : asignación
+Activo "0..1" -- "0..*" Evento : identidad directa, cuando existe
+note bottom of Activo
+Concepto lógico tipo + serie.
+No existe una tabla Activo adicional.
+Recepción inicial sin OS.
+end note
+@enduml
+```
+
+## Diagrama renderizado
+
+![Diagrama 07](07_UML_Clases_Conceptuales_V2.0.svg)
+
+[Fuente PlantUML](07_UML_Clases_Conceptuales_V2.0.puml) · [Abrir SVG](07_UML_Clases_Conceptuales_V2.0.svg).
+
+Actualización documental V2.0 del 13-10-2026. Fuente editable y SVG concordantes; no acredita aprobación de fase ni ejecución operacional.

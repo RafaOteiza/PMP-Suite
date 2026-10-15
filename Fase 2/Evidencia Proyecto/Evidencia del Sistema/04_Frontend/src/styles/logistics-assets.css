@@ -1,0 +1,100 @@
+/* Dashboard and inventory only. All surfaces, feedback and accents use PMP tokens. */
+.logistics-assets { min-width: 0; }
+.logistics-assets > .panel { margin-top: 20px; }
+.logistics-assets .asset-kpis { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
+.logistics-assets .inventory-kpis { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.logistics-assets .asset-kpis .stat-card { min-width: 0; min-height: 116px; padding: 16px; }
+.logistics-assets .asset-kpis .stat-value { font-size: 28px; }
+.logistics-assets .asset-kpis .stat-detail { font-size: 12px; line-height: 1.45; }
+.logistics-assets .asset-kpis .stat-icon { width: 34px; height: 34px; flex-shrink: 0; }
+.logistics-assets .section-heading { align-items: flex-start; gap: 12px; }
+.logistics-assets .section-heading p { margin-bottom: 0; max-width: 78ch; }
+.asset-bar { width: 100%; background: transparent; color: var(--text-main); border: 0; padding: 6px 4px; border-radius: var(--radius-sm,6px); text-align: left; cursor: pointer; font: inherit; }
+.asset-bar > span:first-child { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.asset-bar small { color: var(--text-secondary); font-weight: 400; }
+.asset-bar-track { display: block; height: 4px; margin-top: 6px; background: var(--surface-sunken); border-radius: 6px; overflow: hidden; }
+.asset-bar-track > span { display: block; width: var(--asset-share); height: 100%; background: var(--primary); border-radius: inherit; }
+.asset-matrix tr:nth-child(even) .asset-bar-track > span { background: var(--brand-teal); }
+.asset-bar:hover { background: var(--primary-soft); }
+.asset-matrix { width: 100%; border-collapse: collapse; font-size: 13px; }
+.asset-matrix :is(td,th) { padding: 6px 8px; border-bottom: 1px solid var(--border-subtle); text-align: right; }
+.asset-matrix th:first-child { text-align: left; font-weight: 500; width: 48%; }
+.asset-matrix thead th { color: var(--text-secondary); font-size: 12px; }
+.asset-matrix .asset-short-label { display: none; }
+.asset-matrix tfoot :is(th,td) { font-weight: 700; background: var(--surface-sunken); padding-block: 12px; }
+.asset-count { min-width: 40px; min-height: 32px; border: 0; border-radius: var(--radius-sm,6px); color: var(--primary-text); background: transparent; font: inherit; font-weight: 600; cursor: pointer; }
+.asset-count:hover { background: var(--primary-soft); }
+.asset-secondary { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; }
+.asset-secondary > div { display: grid; grid-template-columns: 20px 1fr; align-content: start; align-items: center; gap: 8px 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md,10px); }
+.asset-secondary > div[data-health="danger"] { border-color: var(--status-danger-border); background: var(--status-danger-bg); }
+.asset-secondary > div[data-health="danger"] > :is(svg,strong,span) { color: var(--status-danger-text); }
+.asset-secondary strong { font-size: 24px; font-variant-numeric: tabular-nums; }
+.asset-secondary span { grid-column: 1/-1; font-weight: 600; font-size: 13px; }
+.asset-secondary small { display: block; color: var(--text-secondary); font-weight: 400; margin-top: 4px; line-height: 1.5; }
+.asset-secondary a { grid-column: 1/-1; justify-self: start; margin-top: 4px; }
+.asset-sections { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.asset-sections .btn[aria-pressed=true] { background: var(--primary-soft); color: var(--primary-text); border-color: var(--primary); }
+.asset-filters { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; align-items: end; padding: 20px 0; }
+.asset-filters label { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.asset-filters :is(input,select) { width: 100%; min-width: 0; min-height: 42px; }
+.asset-search { grid-column: span 2; }
+.asset-search > div { display: flex; gap: 6px; }
+.asset-search .btn { flex-shrink: 0; }
+.asset-table-wrap { width: 100%; }
+.asset-logistics-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; }
+.asset-logistics-table :is(td,th) { text-align: left; vertical-align: top; padding: 14px 10px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.asset-logistics-table th { font-size: 12px; color: var(--text-secondary); background: var(--surface-sunken); }
+.asset-logistics-table th:first-child { width: 18%; }
+.asset-logistics-table th:nth-child(3) { width: 21%; }
+.asset-logistics-table th:nth-child(4) { width: 13%; }
+.asset-logistics-table td > :is(span,small,strong) { display: block; }
+.asset-logistics-table small { color: var(--text-secondary); font-size: 12px; margin-top: 5px; line-height: 1.45; }
+.asset-logistics-table .status-badge { display: inline-flex; white-space: normal; line-height: 1.4; }
+.asset-series { font-size: 14px; margin-bottom: 5px; }
+.asset-row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.asset-row-actions .btn { white-space: normal; text-align: center; }
+.asset-logistics-table tbody tr:hover { background: var(--surface-sunken); }
+.asset-pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; }
+.asset-pagination > div { display: flex; gap: 8px; }
+.asset-recent { list-style: none; padding: 0; margin: 0; }
+.asset-recent li { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); }
+.asset-recent li:last-child { border-bottom: 0; }
+.asset-recent li > div { flex: 1; min-width: 200px; }
+.asset-recent li :is(strong,span) { display: block; }
+.asset-recent strong { font-size: 13px; margin-bottom: 4px; }
+.logistics-assets :is(.asset-bar,.asset-count):focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+@media (max-width: 1100px) {
+ .asset-secondary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 760px) {
+ .logistics-assets .asset-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+ .logistics-assets .asset-kpis .stat-card { padding: 12px; }
+ .logistics-assets .asset-kpis .stat-icon { display: none; }
+ .logistics-assets .asset-kpis .stat-label { font-size: 12px; }
+ .asset-filters { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .asset-logistics-table :is(thead,caption) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+ .asset-logistics-table :is(tbody,tr) { display: block; width: 100%; }
+ .asset-logistics-table tr { margin-top: 12px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-md,10px); }
+ .asset-logistics-table td { display: grid; grid-template-columns: 96px minmax(0,1fr); gap: 4px 8px; padding: 10px 0; border: 0; }
+ .asset-logistics-table td::before { content: attr(data-label); grid-column: 1; grid-row: 1/5; color: var(--text-secondary); font-size: 12px; }
+ .asset-logistics-table td > * { grid-column: 2; }
+ .asset-logistics-table small { margin-top: 0; }
+ .asset-logistics-table .status-badge { justify-self: start; }
+ .asset-matrix :is(td,th) { padding: 4px; font-size: 12px; }
+ .asset-matrix thead th { overflow-wrap: anywhere; white-space: normal; text-overflow: clip; overflow: visible; letter-spacing: normal; text-transform: none; }
+ .asset-matrix .asset-wide-label { display: none; }
+ .asset-matrix .asset-short-label { display: inline; text-decoration: none; }
+ .asset-bar > span:first-child { font-size: 12px; gap: 6px; flex-wrap: wrap; }
+ .asset-count { min-width: 32px; min-height: 44px; }
+ .asset-matrix-wrap { min-width: 0; }
+ .asset-matrix { table-layout: fixed; }
+ .asset-matrix th:first-child { width: 43%; }
+}
+@media (max-width: 420px) {
+ .asset-secondary { gap: 8px; }
+ .asset-secondary > div { padding: 10px; gap: 6px; }
+ .asset-secondary .btn { padding: 8px; white-space: normal; font-size: 12px; text-align: left; }
+ .asset-pagination { flex-direction: column; align-items: stretch; }
+ .asset-pagination > div { justify-content: space-between; }
+ .asset-sections .btn { flex: 1 1 42%; font-size: 12px; white-space: normal; }
+}

@@ -1,0 +1,44 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+hide circle
+skinparam linetype ortho
+entity ordenes_servicio {
+ * codigo_os
+ --
+ tipo_equipo
+ validador_serie
+ consola_serie
+ es_pod
+ es_instalacion
+ estado_id
+ ubicacion_id
+ tecnico_terreno_id
+ tecnico_laboratorio_id
+ qa_usuario_id
+ caso_id
+ os_origen
+ stock_origen_os
+ stock_origen_evento
+}
+
+entity guias
+entity guia_detalle
+
+entity bridges
+entity bridge_mantenimiento
+entity instalaciones_equipos
+ordenes_servicio ||--o| bridge_mantenimiento
+bridges ||--o| bridge_mantenimiento
+bridges ||--o| instalaciones_equipos
+guias ||--o{ guia_detalle
+ordenes_servicio |o--o{ guia_detalle
+legend bottom
+Vista temática complementaria. Relaciones externas
+a esta vista permanecen en el ERD general.
+endlegend
+@enduml

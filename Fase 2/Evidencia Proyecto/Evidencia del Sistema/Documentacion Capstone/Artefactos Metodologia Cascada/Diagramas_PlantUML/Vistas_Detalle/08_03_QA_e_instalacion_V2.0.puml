@@ -1,0 +1,42 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+actor "Técnico Terreno" as TT
+participant API
+participant "Logística" as B
+participant "Jefe Lab" as JL
+participant QA
+database PostgreSQL as DB
+QA -> API : validar/confirmar recepción
+QA -> API : iniciar Ambiente
+QA -> API : registrar pruebas
+QA -> API : dictamen
+alt RECHAZADO
+ QA -> API : validar y confirmar salida
+ B -> API : validar y confirmar recepción
+ B -> API : nuevo despacho a Lab
+ API -> DB : salida e inicio de nuevo ciclo
+ JL -> API : nueva recepción y asignación
+ ref over JL,QA
+ Repetir trabajo Lab y QA con evidencia nueva
+ (flujo conectado en diagrama 11)
+ end ref
+else OPERATIVO
+ QA -> API : validar y confirmar salida
+ B -> API : validar y confirmar recepción
+ B -> API : validar activo + destino
+ B -> API : confirmar despacho instalación
+ API -> DB : crea IN + SALIDA_BODEGA_TERRENO
+ TT -> API : completar instalación
+ alt instalación operativa
+  API -> DB : INSTALACION_COMPLETADA
+ else instalación fallida
+  API -> DB : INSTALACION_FALLIDA / retorno Bodega
+ end
+end
+
+@enduml

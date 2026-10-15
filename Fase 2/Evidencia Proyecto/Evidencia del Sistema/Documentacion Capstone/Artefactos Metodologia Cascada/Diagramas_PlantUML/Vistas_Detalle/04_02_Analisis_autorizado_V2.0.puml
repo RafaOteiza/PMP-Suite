@@ -1,0 +1,29 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+participant "Web / Mobile" as C
+participant "API" as A
+database "PostgreSQL" as P
+participant "Python IA" as I
+opt análisis Python autorizado
+C -> A : GET predictive-report + Bearer
+A -> A : identidad + ai.read
+A -> I : ejecutar --json
+I -> P : SELECT históricos
+P --> I : datos
+I --> A : JSON heurístico
+A --> C : JSON heurístico
+end
+opt análisis de mantenimiento autorizado
+C -> A : GET operational-insights
+A -> A : ai.read + agregación
+A -> P : SELECT OS, cierres, entregas y stock
+P --> A : antecedentes
+A --> C : JSON descriptivo y estimaciones condicionadas
+end
+
+@enduml

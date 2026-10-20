@@ -1,183 +1,350 @@
-# PMP Suite V2.0
+# PMP Suite
 
-Proyecto Capstone para gestionar activos, órdenes de servicio, custodia, mantenimiento, QA, repuestos y trazabilidad de validadores y consolas. Incluye Web, Mobile, API, PostgreSQL, Firebase y analítica descriptiva/heurística. La entrega y presentación están previstas para el **23 de octubre de 2026**.
+> **Plataforma integral para la gestión de mantenimiento y trazabilidad de validadores y consolas.**
 
-Esta guía permite preparar el entorno desde cero. Los resultados, límites y pendientes actuales están en [Estado y pendientes](Documentacion%20Capstone/ESTADO_Y_PENDIENTES.md). V2.0 identifica la entrega documental; los paquetes conservan `1.0.0`. Esta copia no contiene historial Git y no necesita Tesis para ejecutarse.
+PMP Suite es un proyecto Capstone de Ingeniería Informática que centraliza el ciclo físico, técnico y administrativo de equipos tecnológicos asociados al transporte público. Integra una aplicación web, una aplicación móvil, una API REST, una base de datos PostgreSQL, autenticación mediante Firebase y un módulo de analítica en Python.
 
-## Requisitos comprobados
+## Tabla de contenidos
 
-Revisión local del 14-10-2026 en Windows. Las versiones siguientes se obtuvieron de los ejecutables y lockfiles utilizados; no son una promesa de compatibilidad con todas las versiones posteriores.
+- [Nombre del proyecto](#nombre-del-proyecto)
+- [Descripción](#descripción)
+- [Módulos principales](#módulos-principales)
+- [Tecnologías utilizadas](#tecnologías-utilizadas)
+- [Arquitectura de la solución](#arquitectura-de-la-solución)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Instrucciones para ejecutar el proyecto localmente](#instrucciones-para-ejecutar-el-proyecto-localmente)
+- [Pruebas](#pruebas)
+- [Integrantes del equipo](#integrantes-del-equipo)
+- [Metodología de trabajo](#metodología-de-trabajo)
+- [Documentación principal](#documentación-principal)
 
-| Componente | Versión comprobada |
+## Nombre del proyecto
+
+**PMP Suite — Gestión integral de mantenimiento y trazabilidad de equipos.**
+
+## Descripción
+
+PMP Suite permite registrar y seguir un equipo desde la detección de una falla en terreno hasta su retiro, recepción en bodega, diagnóstico, reparación, control de calidad, retorno a stock y posterior reinstalación.
+
+La plataforma está dirigida a los equipos de **Terreno, Logística/Bodega, Laboratorio, Control de Calidad (QA), Administración y Gerencia** que intervienen en el mantenimiento de validadores y consolas.
+
+### Problema que resuelve
+
+El proceso original depende de planillas independientes, correos, guías de despacho, registros técnicos y controles separados por área. Esta fragmentación dificulta conocer con certeza:
+
+- la ubicación y custodia actual de cada equipo;
+- el estado real de una orden de servicio;
+- la relación entre activo, caso, orden, falla, reparación y evidencia;
+- el historial técnico de una serie;
+- los repuestos utilizados y el stock disponible;
+- el resultado de las pruebas de QA;
+- los tiempos de atención, reincidencias e indicadores operacionales.
+
+PMP Suite aborda esta brecha mediante una **fuente operacional centralizada**, identidad única por tipo y número de serie, control de acceso por rol, eventos de trazabilidad, evidencia por movimiento y un historial transversal por activo.
+
+## Módulos principales
+
+| Módulo | Función principal |
 |---|---|
-| Node.js / npm | 24.15.0 / 11.12.1 |
-| Python del módulo IA | 3.13.14 |
-| PostgreSQL | Cliente 18.1; el esquema conservado fue extraído de servidor 18.1. Servidor habitual no consultado en esta revisión. |
-| Backend | Express 4.22.1, pg 8.16.3, Firebase Admin 12.7.0 |
-| Web | React 18.3.1, Vite 5.4.21, TypeScript 5.9.3, Firebase 12.7.0 |
-| Mobile | Expo 57.0.22, React Native 0.86.3, React 19.2.3, Firebase 12.8.0 |
-| Python | pandas 3.0.3, python-dotenv 1.0.1, psycopg2-binary 2.9.11 |
+| Terreno | Reporte de fallas, consulta de órdenes asignadas, retiro e instalación de equipos y captura de evidencia desde dispositivos móviles. |
+| Logística y Bodega | Registro de activos, recepción, inventario, asignación, movimientos, despachos y control de repuestos. |
+| Laboratorio | Recepción física, custodia, asignación de carga, diagnóstico, reparación, pruebas técnicas y preparación de salida. |
+| Control de Calidad | Recepción desde laboratorio, ejecución de pruebas, aprobación o rechazo y despacho posterior. |
+| Administración y Gerencia | Gestión de usuarios y roles, supervisión, dashboards, reportes e indicadores de solo lectura según permisos. |
+| Trazabilidad y Bridge | Historial por activo, consulta de movimientos y vinculación controlada con referencias externas. |
+| Analítica | Detección de reincidencias, equipos sin movimiento y apoyo a la supervisión operacional. |
 
-Se necesitan acceso autorizado a PostgreSQL y Firebase Authentication, una cuenta habilitada en ambos sistemas, y conexión a Internet para instalar dependencias y autenticar. Mobile requiere un cliente nativo compatible con Expo SDK 57 o un build de desarrollo, además de conectividad hacia la API. La exportación JavaScript no instala una app en el teléfono. No se ha comprobado aquí un cliente Expo Go ni un build nativo instalado.
+## Tecnologías utilizadas
 
-## Carpetas
+| Capa | Tecnologías | Uso en la solución |
+|---|---|---|
+| Lenguajes | JavaScript, TypeScript, Python y SQL | Implementación de clientes, API, analítica y persistencia. |
+| Frontend web | React 18, TypeScript, Vite 5, React Router, Axios, Recharts y SheetJS/XLSX | Operación web, administración, dashboards y exportación de reportes. |
+| Aplicación móvil | Expo SDK 57, React Native 0.86, React Navigation, Expo Camera, Image Picker y AsyncStorage | Operación de Terreno, lectura/captura de evidencia y consulta móvil. |
+| Backend | Node.js, Express 4, PostgreSQL Driver (`pg`), Firebase Admin, Swagger/OpenAPI y Sharp | API REST, reglas de negocio, autorización, transacciones, documentación y tratamiento de evidencias. |
+| Base de datos | PostgreSQL, esquema `pmp` | Activos, órdenes, movimientos, usuarios, repuestos, evidencias, QA e historial. |
+| Cloud e identidad | Firebase Authentication y Firebase Admin SDK | Inicio de sesión, validación de identidad y administración segura de sesiones. |
+| Analítica | Python 3, pandas, psycopg2 y python-dotenv | Procesamiento de datos y análisis operacional bajo demanda. |
+| Ingeniería y documentación | Git, GitHub, Mermaid, Markdown, Swagger y pruebas nativas de Node.js | Versionamiento, colaboración, diagramas, documentación y validación automatizada. |
 
-`03_Backend/pmp-api`: API Express. `04_Frontend`: Web. `07_Mobile`: Expo. `06_ModelosIA`: analizador Python. `shared`: contratos de sesión e identidad usados por ambos clientes; conservarlo al copiar el proyecto. `05_BaseDatos`: esquema y migraciones históricas. `01_Requerimientos`, `02_Arquitectura`, `08_Pruebas` y `Documentacion Capstone`: especificación y documentación. Los cinco Word vigentes están en [Artefactos Metodología Cascada](Documentacion%20Capstone/Artefactos%20Metodologia%20Cascada/).
+## Arquitectura de la solución
 
-## Instalar dependencias
+PMP Suite utiliza una arquitectura **cliente-servidor modular**. La aplicación web y la aplicación móvil consumen una API REST central. La API concentra las reglas de negocio, la autorización, las validaciones de custodia y las transacciones. PostgreSQL mantiene la información operacional y Firebase valida la identidad de los usuarios.
 
-Abrir PowerShell en la raíz de esta carpeta. No copiar `node_modules` ni entornos Python de otra ubicación. Mantener los lockfiles y no ejecutar `npm update` para reproducir esta versión.
+```mermaid
+flowchart LR
+    UW["Usuarios Web<br/>Administración · Gerencia · Logística · Laboratorio · QA"] --> WEB["Aplicación Web<br/>React + Vite"]
+    UT["Técnico de Terreno"] --> MOB["Aplicación Mobile<br/>Expo + React Native"]
 
-```powershell
-Push-Location 03_Backend/pmp-api
-npm.cmd ci --ignore-scripts --no-audit --no-fund
-Pop-Location
-Push-Location 04_Frontend
-npm.cmd ci --ignore-scripts --no-audit --no-fund
-Pop-Location
-Push-Location 07_Mobile
-npm.cmd ci --ignore-scripts --no-audit --no-fund
-Pop-Location
-python -m venv 06_ModelosIA/.venv
-& ./06_ModelosIA/.venv/Scripts/python.exe -m pip install -r 06_ModelosIA/requirements.txt
-& ./06_ModelosIA/.venv/Scripts/python.exe -m pip check
+    WEB -->|REST / JSON| API["API REST<br/>Node.js + Express"]
+    MOB -->|REST / JSON| API
+
+    WEB -->|Autenticación| FB["Firebase Authentication"]
+    MOB -->|Autenticación| FB
+    API -->|Validación de token| FB
+
+    API -->|Lectura y escritura transaccional| DB[("PostgreSQL<br/>schema pmp")]
+    API -->|Ejecución bajo demanda| IA["Analítica Python<br/>pandas + psycopg2"]
+    IA -->|Lectura autorizada| DB
 ```
 
-La instalación limpia no se repitió durante este cierre: se verificaron las dependencias ya instaladas mediante suites, build y exportaciones; `pip check` pasó. Los comandos `npm ci`, creación del venv e instalación pip son instrucciones revisadas, todavía no verificadas en un equipo vacío. `--ignore-scripts` evita hooks de instalación; si falta un binario nativo, revisar el error concreto y su paquete antes de autorizar su script, sin actualizar toda la aplicación.
+### Principios arquitectónicos
 
-## Configurar sin compartir secretos
+1. **Backend autoritativo:** los permisos y reglas críticas se validan en la API, no solamente en la interfaz.
+2. **Identidad y autorización separadas:** Firebase autentica al usuario; PostgreSQL determina si la cuenta está activa y cuál es su rol efectivo.
+3. **Physical First:** escanear o seleccionar un equipo no cambia su custodia; el movimiento debe validarse y confirmarse con su evidencia correspondiente.
+4. **Trazabilidad por eventos:** cada movimiento relevante conserva actor, fecha, origen, destino, contexto y evidencia.
+5. **Identidad técnica única:** el tipo y la serie determinan de forma transversal la marca y el modelo del activo.
+6. **Analítica no intrusiva:** el módulo Python apoya la supervisión y trabaja principalmente en modo lectura; no reemplaza la decisión operacional.
 
-Para una instalación nueva, copiar cada `.env.example` a `.env` **solo si el archivo no existe**. En esta copia ya existe configuración privada; no sobrescribirla. Completar los valores fuera de la documentación.
+## Estructura del repositorio
 
-| Módulo | Configuración |
-|---|---|
-| Backend `.env` | `PORT` (4000), `DATABASE_URL`, `FIREBASE_SERVICE_ACCOUNT_PATH` con ruta absoluta a la credencial Admin externa a la entrega. |
-| Web `.env` | `VITE_CORE_URL=http://localhost:4000`; `VITE_API_URL` es fallback legacy, también sin `/api`. Configurar `VITE_FB_API_KEY`, `VITE_FB_AUTH_DOMAIN`, `VITE_FB_PROJECT_ID`, `VITE_FB_STORAGE_BUCKET`, `VITE_FB_MESSAGING_SENDER_ID` y `VITE_FB_APP_ID` del proyecto autorizado. |
-| Mobile `.env` | `EXPO_PUBLIC_API_URL=http://<IPv4-LAN-del-PC>:4000/api`. En emulador Android puede usarse `http://10.0.2.2:4000/api`. La configuración cliente Firebase está en `src/services/firebase.js`; una instalación independiente debe configurarla para su proyecto. |
-| IA | La API busca `06_ModelosIA/.venv/Scripts/python.exe` en Windows y `.venv/bin/python` en Unix. `analyzer.py` lee `03_Backend/pmp-api/.env` y respeta variables ya definidas en el proceso. No tiene servidor propio. |
-
-Web, Mobile y Admin deben apuntar al mismo proyecto Firebase autorizado. La API verifica el token y consulta `pmp.usuarios`: usuario activo, rol válido y coincidencia única entre correo e identidad Firebase. Crear una cuenta Firebase por sí solo no habilita acceso a PMP. La preparación de usuarios corresponde al administrador; no hay una contraseña inicial pública ni un seed de administrador.
-
-Los valores `VITE_*` y `EXPO_PUBLIC_*` quedan visibles en los bundles: nunca colocar allí claves privadas, contraseñas ni credenciales Admin. No publicar `.env`, claves, dumps, capturas de sesión o archivos de cuenta de servicio.
-
-## PostgreSQL existente e instalación independiente
-
-**Usar la BD existente.** Esta copia reutiliza la BD y Firebase habituales. Mantener la configuración privada existente, iniciar los servicios autorizados si corresponde y no aplicar `schema_actual.sql`, migraciones ni seeds. Las acciones confirmadas en la aplicación escriben en esa BD; las pruebas automatizadas descritas abajo usan mocks. No se ha cambiado configuración, usuarios ni datos durante este cierre.
-
-**Instalación independiente.** `05_BaseDatos/schema_actual.sql` contiene 26 tablas y sus objetos del esquema `pmp`, sin filas, propietarios ni concesiones. Puede servir como estructura inicial en PostgreSQL 18, pero **no produce una aplicación operativa por sí solo**. Antes de restaurar debe prepararse una base nueva identificada inequívocamente y un rol con los permisos apropiados. Este procedimiento no se ejecutó ni se autoriza sobre la BD habitual.
-
-Faltan datos iniciales aprobados y un procedimiento reproducible para:
-
-- `estados`, `ubicaciones` y `config_estado_ubicacion`: IDs, nombres y correspondencias que consumen las transiciones y consultas del código. No asignarlos arbitrariamente.
-- `terminales`, `pst`, `terminal_pst` y `buses`: contexto operacional y relaciones válidas.
-- `usuarios`: primera cuenta administrativa, roles e identidades Firebase coherentes.
-- `repuestos`: catálogo, categorías y umbrales; las existencias deben originarse en datos autorizados, sin inventarlas.
-
-Los maestros de activos y los movimientos se incorporan después mediante el flujo autorizado. Los fixtures E2E son datos sintéticos de pruebas, no un catálogo de instalación. Las migraciones conservadas son cambios históricos y no contienen un seed completo; no reaplicarlas después del esquema actual. También faltan validar restauración, permisos, recuperación y configuración del Firebase independiente. Una vez resueltos estos puntos, el responsable podrá preparar y ensayar el procedimiento; esta guía no declara reconstrucción independiente completa.
-
-## Arrancar y acceder
-
-Usar tres terminales desde la raíz. Comprobar primero que los puertos 4000, 5173 y 8081 no estén ocupados; no detener procesos ajenos automáticamente.
-
-```powershell
-# Terminal 1
-cd 03_Backend/pmp-api
-npm.cmd run dev
+```text
+PMP-Suite/
+├── Fase 1/
+│   ├── Evidencias Grupales/
+│   └── Evidencias Individuales/
+└── Fase 2/
+    └── Evidencia Proyecto/
+        └── Evidencia del Sistema/
+            ├── 01_Requerimientos/
+            ├── 02_Arquitectura/
+            ├── 03_Backend/pmp-api/
+            ├── 04_Frontend/
+            ├── 05_BaseDatos/
+            ├── 06_ModelosIA/
+            ├── 07_Mobile/
+            ├── 08_Pruebas/
+            ├── 09_BrandKit/
+            ├── Documentacion Capstone/
+            ├── shared/
+            └── README.md
 ```
 
-```powershell
-# Terminal 2
-cd 04_Frontend
-npm.cmd run dev -- --host 127.0.0.1 --strictPort
+El código ejecutable se encuentra en **`Fase 2/Evidencia Proyecto/Evidencia del Sistema`**. El presente archivo actúa como README global del repositorio y la guía técnica interna contiene el detalle operativo del entorno.
+
+## Instrucciones para ejecutar el proyecto localmente
+
+### 1. Requisitos previos
+
+Entorno verificado:
+
+- Git.
+- Node.js 24.x y npm 11.x.
+- Python 3.13.x.
+- PostgreSQL 18.x o una instancia compatible.
+- Proyecto autorizado de Firebase Authentication.
+- Credencial de Firebase Admin almacenada fuera del repositorio.
+- Cuenta habilitada tanto en Firebase como en la tabla `pmp.usuarios`.
+- Para Mobile: cliente compatible con Expo SDK 57 o un build de desarrollo.
+
+### 2. Clonar y entrar al sistema
+
+```bash
+git clone https://github.com/RafaOteiza/PMP-Suite.git
+cd PMP-Suite
+cd "Fase 2/Evidencia Proyecto/Evidencia del Sistema"
 ```
 
-```powershell
-# Terminal 3
-cd 07_Mobile
-npm.cmd start
+Los siguientes comandos se ejecutan desde la carpeta **`Evidencia del Sistema`**, utilizando terminales separadas para Backend, Web y Mobile.
+
+### 3. Configurar el Backend
+
+```bash
+cd "03_Backend/pmp-api"
+npm ci
 ```
 
-Web: `http://localhost:5173`. Salud API: `http://localhost:4000/api/health`. Swagger: `http://localhost:4000/docs`. Metro usa normalmente 8081; seguir la dirección que informe la terminal. Para acceso desde teléfono, Backend debe ser alcanzable por LAN y la URL no puede ser `localhost`. Revisar red y reglas existentes con el responsable; no abrir puertos ni cambiar permisos automáticamente. Reiniciar Metro después de cambiar su configuración cliente.
+Copiar `.env.example` como `.env` y completar los valores autorizados:
 
-Ingresar con la cuenta propia. Logística registra, recibe y despacha; Jefe de Laboratorio recibe y asigna; Técnico Lab trabaja las OS asignadas; QA recibe, prueba y dictamina; Terreno reporta, retira e instala su trabajo. Admin administra usuarios y consulta; Gerente consulta. La autorización efectiva está en Backend y no depende de ocultar botones.
-
-Los arranques están revisados en sus scripts. Durante este cierre se comprobaron la API con identidad/BD simuladas y la compilación de clientes; no se repitió el arranque conectado a los servicios habituales ni el login real.
-
-## Pruebas y compilación seguras
-
-Desde la raíz, los siguientes comandos no preparan datos de negocio. Los destinos inválidos refuerzan el aislamiento Backend; sus pruebas HTTP usan servidores locales efímeros y mocks de PostgreSQL/Firebase.
-
-```powershell
-Push-Location 03_Backend/pmp-api
-$env:DATABASE_URL='postgresql://isolated:isolated@127.0.0.1:1/isolated'
-$env:FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:1'
-npm.cmd test
-Remove-Item Env:DATABASE_URL,Env:FIREBASE_AUTH_EMULATOR_HOST
-Pop-Location
-Push-Location 04_Frontend
-npm.cmd test
-npm.cmd run build
-Pop-Location
-Push-Location 07_Mobile
-npm.cmd test
-$env:EXPO_NO_DOTENV='1'
-$env:EXPO_OFFLINE='1'
-$env:EXPO_PUBLIC_API_URL='http://127.0.0.1:1/api'
-& ./node_modules/.bin/expo.cmd export --platform ios --platform android
-Remove-Item Env:EXPO_NO_DOTENV,Env:EXPO_OFFLINE,Env:EXPO_PUBLIC_API_URL
-Pop-Location
+```env
+PORT=4000
+DATABASE_URL=postgresql://usuario:contrasena@localhost:5432/pmp_suite
+FIREBASE_SERVICE_ACCOUNT_PATH=C:\ruta\segura\firebase-admin.json
 ```
 
-Ejecutarlos en una terminal dedicada para no reemplazar variables de otra sesión. El build Web usa `.env`; para compartir un build de prueba, configurar valores ficticios de Firebase/API en el proceso. En esta revisión ambos bundles se generaron con destino temporal y API ficticia; Expo se ejecutó sin red y sin cargar `.env`. Ningún bundle generado acredita ejecución en dispositivo.
+En PowerShell se puede crear la copia con:
 
-Mobile reutiliza todos los casos de `04_Frontend/test/requirements.frontend.test.mjs`, además de sus suites `settings` y `ui`: requiere también las dependencias Web. Sus totales incluyen casos compartidos y no deben sumarse como cobertura única. No existe script `lint`; TypeScript y las suites no equivalen a lint. Los ejecutores `verification/*.mjs` y `*.browser.mjs` tienen precondiciones propias y no forman parte de estos comandos. Revisarlos antes de usarlos; algunos necesitan instancias efímeras, fixtures o baselines que esta copia no contiene.
+```powershell
+Copy-Item .env.example .env
+```
 
-## Resultados y pendientes — 18 de octubre de 2026
+Iniciar la API:
 
-Revisión limitada a `PMP_Suite_V2.0`: contratos de mocks, inventario de pruebas, suites completas declaradas y compilación/exportación. No se consultó Tesis, no se alteraron pruebas o aserciones y no se ejecutaron ciclos, migraciones, login real ni escrituras sobre la BD habitual. PostgreSQL y Firebase se aislaron con mocks y destinos de prueba `127.0.0.1:1`; los resultados de esta sección corresponden a esta ejecución, no a evidencias antiguas.
+```bash
+npm run dev
+```
 
-| Comprobación | Aprobadas | Fallidas | Omitidas | Alcance |
-|---|---:|---:|---:|---|
-| Backend, `npm.cmd test` | 125 | 0 | 0 | Los 15 archivos `*.test.js` declarados |
-| Web, `npm.cmd test` | 285 | 0 | 0 | Los 16 archivos `*.test.mjs` declarados |
-| Mobile, `npm.cmd test` | 210 | 0 | 0 | Los 3 archivos `*.test.mjs` declarados; incluye casos compartidos con Web |
-| Web, `npm.cmd run build -- --outDir <temporal>` | Correcto | — | — | TypeScript y Vite, API/Firebase cliente ficticios |
-| Expo, `expo export --platform ios --platform android --output-dir <temporal>` | Ambas plataformas | — | — | Offline, sin cargar `.env`, API ficticia; bundles Hermes, no compilación nativa |
+Servicios disponibles:
 
-Cero cancelaciones y cero casos TODO en las suites. No quedaron archivos `*.test.*` fuera de los scripts declarados. No se suman sus totales como cobertura única.
+- API: `http://localhost:4000/api`
+- Estado de salud: `http://localhost:4000/api/health`
+- Swagger: `http://localhost:4000/docs`
 
-**Causa de los fallos anteriores.** El mock nativo compartido de `04_Frontend/test/requirements.frontend.test.mjs` carecía de `useAuth`, que sí exporta `07_Mobile/src/context/AuthContext.js` y consume `AssetHistoryScreen`. El mock de reportes carecía de `usersReport`, exportado realmente por `04_Frontend/src/utils/pageReports.ts` y requerido por `AdminUsersPage`. Ambas omisiones impedían importar componentes y registrar los casos siguientes. La versión encontrada ya contiene las dos correcciones: `useAuth()` devuelve el usuario/estado necesarios para esos escenarios y `usersReport(q, disabled)` respeta la forma del contrato de reporte. Las suites confirman que esos fallos ya no se reproducen; no fue necesario volver a modificar mocks ni código funcional.
+### 4. Configurar el Frontend web
 
-**210 frente a 172 Mobile.** El comando anterior explícito y el actual `npm.cmd test` incluyen exactamente `test/operational-regression.test.mjs`, `test/settings.test.mjs` y `test/ui.test.mjs`. El desglose ejecutado por archivo es **136 + 39 + 35 = 210**. `operational-regression` importa directamente toda la suite Web de requerimientos. El registro local del 14-10 en `Documentacion Capstone/ESTADO_Y_PENDIENTES.md` documenta que las 172 entradas anteriores fueron 171 aprobadas y una entrada de archivo fallida por `usersReport`: faltaban registrar 39 casos, no archivos; 171 + 39 = 210 al desaparecer esa entrada fallida. Esta explicación histórica se contrasta con el registro conservado y el inventario/comando actuales; no se reabrieron los logs excluidos ni el proyecto original. La ejecución vigente cubre la suite automatizada declarada completa.
+Desde una nueva terminal ubicada en `Evidencia del Sistema`:
 
-### Pendientes y límites de esta revisión
+```bash
+cd "04_Frontend"
+npm ci
+```
 
-- **Persistencia Firebase Mobile, defecto funcional separado:** `src/services/firebase.js` usa `getAuth(app)` sin persistencia React Native. El SDK instalado confirma que ese camino conserva la sesión solo en memoria y emite el aviso adjunto. AsyncStorage ya está declarado e instalado; falta integrarlo en la inicialización de Auth. No se cambió autenticación en esta tarea.
-- **Safe Area:** el aviso global de sesión se renderiza fuera del encabezado nativo y el contenedor de `App.js` excluye el borde superior. Esto coincide con el solapamiento de la captura. Las pruebas con primitivas nativas simuladas no acreditan esa geometría en iPhone; corrección y comprobación física pendientes.
-- **Conexión y enlace Expo:** «Sin conexión» procede del manejo de errores de red de la API y no demuestra que falle la contraseña. El aviso de redirect `custom/ios` corresponde al middleware de Expo cuando no obtiene destino para el cliente de desarrollo; es independiente de `useAuth`/`usersReport`. Falta comprobar la URL LAN/API y el cliente instalado en el teléfono; no se alteraron servicios ni configuración.
-- **Cobertura adicional:** no se ejecutaron `visual.browser.mjs`, escenarios E2E de `verification` ni pruebas físicas de sesión, cámara, QR, PoD, teclado o navegación. Son comprobaciones aparte de los 210 casos, no pruebas omitidas por el ejecutor. Los mocks sustituyen Firebase y geometría nativa; las suites aprobadas no cierran esos pendientes.
-- **Word:** el README recibido ya estaba en UTF-8 sin caracteres de sustitución ni texto dañado detectado en sus referencias a Word. Este resumen conserva las tildes correctas. No se modificaron ni renderizaron documentos académicos; su revisión anterior no se presenta como realizada ahora.
+Copiar `.env.example` como `.env` y configurar:
 
-Único archivo editado en esta tarea: `README.md`, en este resumen de resultados y pendientes. Se retiraron las salidas temporales de compilación/exportación; no se generaron informes adicionales.
+```env
+VITE_CORE_URL=http://localhost:4000
+VITE_API_URL=http://localhost:4000
+VITE_FB_API_KEY=TU_API_KEY
+VITE_FB_AUTH_DOMAIN=TU_AUTH_DOMAIN
+VITE_FB_PROJECT_ID=TU_PROJECT_ID
+VITE_FB_STORAGE_BUCKET=TU_STORAGE_BUCKET
+VITE_FB_MESSAGING_SENDER_ID=TU_MESSAGING_SENDER_ID
+VITE_FB_APP_ID=TU_APP_ID
+```
 
-## Problemas frecuentes
+Iniciar la aplicación:
 
-| Síntoma | Comprobación |
-|---|---|
-| API no inicia | Ejecutar desde `03_Backend/pmp-api`, comprobar Node, puerto y existencia de la ruta privada Admin, sin imprimir la clave. |
-| Web no conecta / 404 | `VITE_CORE_URL` apunta a la raíz de API, sin `/api`; reiniciar Vite tras modificar `.env`. |
-| Mobile no conecta | API con sufijo `/api`, IP LAN vigente, misma red y cliente compatible. El teléfono no comparte el `localhost` del PC. |
-| 401 | Sesión ausente, vencida o revocada: reautenticar con la cuenta propia. |
-| 403 o `IDENTITY_CONFLICT` | Revisar usuario activo, rol y vínculo único UID/correo con el administrador. No cambiar permisos para eludir el error. |
-| 409 / evidencia inválida | Consultar custodia y ciclo actuales; obtener evidencia del propósito correcto antes de confirmar. Escanear no confirma el movimiento. |
-| IA 503 | Verificar el venv en la ruta indicada, `pip check` y conectividad autorizada de PostgreSQL. No interpretar el error como ausencia de fallas. |
-| Datos vacíos al instalar | El esquema no incluye catálogos ni usuarios; resolver la preparación independiente antes de probar el flujo. |
-| `spawn EPERM` en pruebas | El ejecutor puede impedir procesos hijos. Usar una terminal local autorizada; no cambiar código ni omitir pruebas para evitar el bloqueo. |
+```bash
+npm run dev
+```
 
-Para continuar el cierre y preparar la presentación, consultar únicamente el [resumen vigente](Documentacion%20Capstone/ESTADO_Y_PENDIENTES.md) y los cinco Word de cascada. Las evidencias históricas de Tesis no son resultados de esta revisión.
+Abrir `http://localhost:5173`.
 
-## Publicación en GitHub
+### 5. Preparar el módulo de analítica
 
-La versión vigente de PMP Suite V2.0 se encuentra en la raíz de este repositorio. Las carpetas `Fase 1` y `Fase 2` ya existentes se conservan como entrega académica previa.
+Desde `Evidencia del Sistema`:
 
-Por seguridad, esta publicación excluye los archivos `.env`, respaldos con datos, la guía de pruebas con contraseñas y el ZIP distribuible privado. Las referencias a ese material requieren acceso privado coordinado con el responsable del proyecto. Los archivos `.env.example` son plantillas; no sustituyen la configuración privada. Esta publicación no acredita una nueva ejecución de pruebas ni un despliegue.
+```bash
+cd "06_ModelosIA"
+python -m venv .venv
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+macOS o Linux:
+
+```bash
+./.venv/bin/python -m pip install -r requirements.txt
+```
+
+El módulo no requiere iniciar un servidor independiente; la API lo ejecuta bajo demanda desde el entorno virtual.
+
+### 6. Configurar la aplicación Mobile
+
+Desde una nueva terminal ubicada en `Evidencia del Sistema`:
+
+```bash
+cd "07_Mobile"
+npm ci
+```
+
+Copiar `.env.example` como `.env`. Para un dispositivo físico se debe usar la IPv4 LAN del equipo que ejecuta la API:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.100:4000/api
+```
+
+Para un emulador Android puede utilizarse:
+
+```env
+EXPO_PUBLIC_API_URL=http://10.0.2.2:4000/api
+```
+
+Iniciar Expo:
+
+```bash
+npm start
+```
+
+### 7. Consideraciones de base de datos
+
+La ejecución habitual utiliza la base PostgreSQL autorizada definida en `DATABASE_URL`. El repositorio incluye `05_BaseDatos/schema_actual.sql` como respaldo estructural del esquema `pmp`, pero ese archivo no contiene todos los catálogos operacionales, usuarios ni datos maestros necesarios para una instalación funcional independiente.
+
+Por lo tanto:
+
+- no se debe restaurar el esquema sobre la base habitual sin respaldo y autorización;
+- una instalación nueva debe incorporar catálogos, estados, ubicaciones, roles, usuarios y relaciones operacionales validadas;
+- las credenciales, archivos `.env`, claves de servicio y respaldos con datos reales no deben subirse al repositorio.
+
+## Pruebas
+
+### Backend
+
+```bash
+cd "03_Backend/pmp-api"
+npm test
+```
+
+### Frontend
+
+```bash
+cd "04_Frontend"
+npm test
+npm run build
+```
+
+### Mobile
+
+```bash
+cd "07_Mobile"
+npm test
+```
+
+Las pruebas automatizadas validan roles, navegación, sesiones, flujos de activos, Bodega, Laboratorio, QA, escaneo, trazabilidad y regresiones operacionales. Para los procedimientos de prueba aislada y exportación Mobile, consultar la guía técnica interna.
+
+## Integrantes del equipo
+
+| Integrante | Rol principal | Responsabilidades |
+|---|---|---|
+| **Rafael Oteiza** | Líder técnico y especialista de dominio | Arquitectura de solución, backend, base de datos, integración, seguridad, analítica y coordinación técnica del proyecto. |
+| **Matías Garrido** | Analista de requerimientos y documentación | Levantamiento funcional, modelamiento de procesos, especificación de requerimientos, trazabilidad y documentación del proyecto. |
+| **Luis Arenas** | Desarrollador Frontend y UX | Diseño e implementación de interfaces, experiencia de usuario, componentes web, responsividad y apoyo en integración y pruebas. |
+
+Las responsabilidades indicadas corresponden al foco principal de cada integrante; el desarrollo y la validación se realizan de manera colaborativa.
+
+## Metodología de trabajo
+
+El proyecto se desarrolla con **metodología en cascada**, adecuada al formato académico del Capstone y a la necesidad de mantener entregables formales y trazables entre etapas.
+
+```text
+Inicio y planificación
+        ↓
+Levantamiento y especificación de requerimientos
+        ↓
+Diseño funcional, de datos y de arquitectura
+        ↓
+Construcción e integración
+        ↓
+Pruebas y validación
+        ↓
+Despliegue, evidencias y cierre
+```
+
+La metodología se apoya en:
+
+- ERS y matriz de trazabilidad para relacionar requerimientos, diseño, implementación y pruebas;
+- WBS, carta Gantt, matriz de riesgos y planes de prueba/despliegue;
+- Git y GitHub para control de versiones y consolidación del trabajo;
+- revisiones incrementales dentro de cada fase antes de cerrar el entregable;
+- pruebas automatizadas y validaciones funcionales para controlar regresiones.
+
+Aunque la metodología principal es cascada, el equipo utiliza prácticas iterativas de revisión y mejora durante la construcción, sin alterar la secuencia formal de los entregables.
+
+## Documentación principal
+
+- [Guía técnica del sistema](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/README.md)
+- [Especificación de Requerimientos de Software](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/01_Requerimientos/ERS_PMP_Suite_V2.0.md)
+- [Arquitectura integral](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/02_Arquitectura/Arquitectura_Integral_PMP_Suite_V2.0.md)
+- [Catálogo de la API](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/02_Arquitectura/CATALOGO_API_V2.0.md)
+- [Modelo y diccionario de datos](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/02_Arquitectura/MODELO_DATOS_DICCIONARIO_V2.0.md)
+- [Problemática y contexto](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/Documentacion%20Capstone/00_PROBLEMATICA_Y_CONTEXTO_V2.0.md)
+- [Estado y pendientes](Fase%202/Evidencia%20Proyecto/Evidencia%20del%20Sistema/Documentacion%20Capstone/ESTADO_Y_PENDIENTES.md)
+
+---
+
+**PMP Suite** busca convertir un proceso fragmentado y dependiente de planillas en una operación integrada, auditable y basada en la trazabilidad real de cada equipo.

@@ -132,6 +132,34 @@ Ejecutarlos en una terminal dedicada para no reemplazar variables de otra sesió
 
 Mobile reutiliza todos los casos de `04_Frontend/test/requirements.frontend.test.mjs`, además de sus suites `settings` y `ui`: requiere también las dependencias Web. Sus totales incluyen casos compartidos y no deben sumarse como cobertura única. No existe script `lint`; TypeScript y las suites no equivalen a lint. Los ejecutores `verification/*.mjs` y `*.browser.mjs` tienen precondiciones propias y no forman parte de estos comandos. Revisarlos antes de usarlos; algunos necesitan instancias efímeras, fixtures o baselines que esta copia no contiene.
 
+## Resultados y pendientes — 18 de octubre de 2026
+
+Revisión limitada a `PMP_Suite_V2.0`: contratos de mocks, inventario de pruebas, suites completas declaradas y compilación/exportación. No se consultó Tesis, no se alteraron pruebas o aserciones y no se ejecutaron ciclos, migraciones, login real ni escrituras sobre la BD habitual. PostgreSQL y Firebase se aislaron con mocks y destinos de prueba `127.0.0.1:1`; los resultados de esta sección corresponden a esta ejecución, no a evidencias antiguas.
+
+| Comprobación | Aprobadas | Fallidas | Omitidas | Alcance |
+|---|---:|---:|---:|---|
+| Backend, `npm.cmd test` | 125 | 0 | 0 | Los 15 archivos `*.test.js` declarados |
+| Web, `npm.cmd test` | 285 | 0 | 0 | Los 16 archivos `*.test.mjs` declarados |
+| Mobile, `npm.cmd test` | 210 | 0 | 0 | Los 3 archivos `*.test.mjs` declarados; incluye casos compartidos con Web |
+| Web, `npm.cmd run build -- --outDir <temporal>` | Correcto | — | — | TypeScript y Vite, API/Firebase cliente ficticios |
+| Expo, `expo export --platform ios --platform android --output-dir <temporal>` | Ambas plataformas | — | — | Offline, sin cargar `.env`, API ficticia; bundles Hermes, no compilación nativa |
+
+Cero cancelaciones y cero casos TODO en las suites. No quedaron archivos `*.test.*` fuera de los scripts declarados. No se suman sus totales como cobertura única.
+
+**Causa de los fallos anteriores.** El mock nativo compartido de `04_Frontend/test/requirements.frontend.test.mjs` carecía de `useAuth`, que sí exporta `07_Mobile/src/context/AuthContext.js` y consume `AssetHistoryScreen`. El mock de reportes carecía de `usersReport`, exportado realmente por `04_Frontend/src/utils/pageReports.ts` y requerido por `AdminUsersPage`. Ambas omisiones impedían importar componentes y registrar los casos siguientes. La versión encontrada ya contiene las dos correcciones: `useAuth()` devuelve el usuario/estado necesarios para esos escenarios y `usersReport(q, disabled)` respeta la forma del contrato de reporte. Las suites confirman que esos fallos ya no se reproducen; no fue necesario volver a modificar mocks ni código funcional.
+
+**210 frente a 172 Mobile.** El comando anterior explícito y el actual `npm.cmd test` incluyen exactamente `test/operational-regression.test.mjs`, `test/settings.test.mjs` y `test/ui.test.mjs`. El desglose ejecutado por archivo es **136 + 39 + 35 = 210**. `operational-regression` importa directamente toda la suite Web de requerimientos. El registro local del 14-10 en `Documentacion Capstone/ESTADO_Y_PENDIENTES.md` documenta que las 172 entradas anteriores fueron 171 aprobadas y una entrada de archivo fallida por `usersReport`: faltaban registrar 39 casos, no archivos; 171 + 39 = 210 al desaparecer esa entrada fallida. Esta explicación histórica se contrasta con el registro conservado y el inventario/comando actuales; no se reabrieron los logs excluidos ni el proyecto original. La ejecución vigente cubre la suite automatizada declarada completa.
+
+### Pendientes y límites de esta revisión
+
+- **Persistencia Firebase Mobile, defecto funcional separado:** `src/services/firebase.js` usa `getAuth(app)` sin persistencia React Native. El SDK instalado confirma que ese camino conserva la sesión solo en memoria y emite el aviso adjunto. AsyncStorage ya está declarado e instalado; falta integrarlo en la inicialización de Auth. No se cambió autenticación en esta tarea.
+- **Safe Area:** el aviso global de sesión se renderiza fuera del encabezado nativo y el contenedor de `App.js` excluye el borde superior. Esto coincide con el solapamiento de la captura. Las pruebas con primitivas nativas simuladas no acreditan esa geometría en iPhone; corrección y comprobación física pendientes.
+- **Conexión y enlace Expo:** «Sin conexión» procede del manejo de errores de red de la API y no demuestra que falle la contraseña. El aviso de redirect `custom/ios` corresponde al middleware de Expo cuando no obtiene destino para el cliente de desarrollo; es independiente de `useAuth`/`usersReport`. Falta comprobar la URL LAN/API y el cliente instalado en el teléfono; no se alteraron servicios ni configuración.
+- **Cobertura adicional:** no se ejecutaron `visual.browser.mjs`, escenarios E2E de `verification` ni pruebas físicas de sesión, cámara, QR, PoD, teclado o navegación. Son comprobaciones aparte de los 210 casos, no pruebas omitidas por el ejecutor. Los mocks sustituyen Firebase y geometría nativa; las suites aprobadas no cierran esos pendientes.
+- **Word:** el README recibido ya estaba en UTF-8 sin caracteres de sustitución ni texto dañado detectado en sus referencias a Word. Este resumen conserva las tildes correctas. No se modificaron ni renderizaron documentos académicos; su revisión anterior no se presenta como realizada ahora.
+
+Único archivo editado en esta tarea: `README.md`, en este resumen de resultados y pendientes. Se retiraron las salidas temporales de compilación/exportación; no se generaron informes adicionales.
+
 ## Problemas frecuentes
 
 | Síntoma | Comprobación |
@@ -147,3 +175,9 @@ Mobile reutiliza todos los casos de `04_Frontend/test/requirements.frontend.test
 | `spawn EPERM` en pruebas | El ejecutor puede impedir procesos hijos. Usar una terminal local autorizada; no cambiar código ni omitir pruebas para evitar el bloqueo. |
 
 Para continuar el cierre y preparar la presentación, consultar únicamente el [resumen vigente](Documentacion%20Capstone/ESTADO_Y_PENDIENTES.md) y los cinco Word de cascada. Las evidencias históricas de Tesis no son resultados de esta revisión.
+
+## Ubicación de esta entrega en GitHub
+
+El código vigente se publica en `Fase 2/Evidencia Proyecto/Evidencia del Sistema`. Los nueve documentos técnicos de la entrega están en la carpeta hermana [Evidencias Documentacion](../Evidencias%20Documentacion/). Las evidencias grupales, individuales y planillas de evaluación se conservan directamente en [Fase 2](../../).
+
+La publicación actual no incorpora los archivos `.env`, el respaldo de datos local, la guía con contraseñas ni el ZIP privado. Las referencias a ese material requieren entrega privada coordinada. Los ejemplos de configuración no contienen las credenciales necesarias para arrancar. Publicar el código no acredita una nueva ejecución de pruebas ni un despliegue.

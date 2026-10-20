@@ -1,0 +1,102 @@
+# 08 — Secuencia End-to-End V2.0
+
+```plantuml
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+actor "Técnico Terreno" as TT
+participant "Mobile/Web" as UI
+participant API
+participant "Logística" as B
+participant "Jefe Lab" as JL
+participant "Técnico Lab" as TL
+participant QA
+database PostgreSQL as DB
+
+TT -> UI : reportar falla
+UI -> API : POST requerimiento/OS
+API -> DB : caso + OS + evento
+
+B -> API : asignar retiro
+API -> DB : técnico Terreno
+
+TT -> API : validar identidad retiro
+API -> DB : evidencia
+TT -> API : confirmar retiro
+API -> DB : RETIRO_TERRENO_CONFIRMADO
+
+B -> API : validar recepción Bodega
+B -> API : confirmar recepción
+API -> DB : custodia Bodega
+
+B -> API : validar salida a Lab
+B -> API : confirmar salida
+API -> DB : SALIDA_BODEGA_LABORATORIO\nEn tránsito; sin carga asignable ni SLA
+
+JL -> API : validar recepción Lab
+JL -> API : confirmar recepción
+API -> DB : RECEPCION_LABORATORIO_CONFIRMADA\nCustodia Lab + inicio SLA del ciclo
+JL -> API : asignar técnico
+API -> DB : tecnico_laboratorio_id
+
+TL -> API : iniciar trabajo
+TL -> API : guardar diagnóstico/intervenciones
+opt PoD requiere repuesto
+ TL -> API : solicitar necesidad
+ API -> DB : solicitud + estado espera
+ B -> API : entregar repuesto
+ API -> DB : descuento stock + evento
+end
+TL -> API : finalizar
+API -> DB : reparación + pruebas + eventos
+
+JL -> API : validar/confirmar salida Lab
+API -> DB : tránsito Bodega
+
+B -> API : validar y confirmar recepción
+B -> API : validar/confirmar salida QA
+API -> DB : ciclo QA
+
+QA -> API : validar/confirmar recepción
+QA -> API : iniciar Ambiente
+QA -> API : registrar pruebas
+QA -> API : dictamen
+alt RECHAZADO
+ QA -> API : validar y confirmar salida
+ B -> API : validar y confirmar recepción
+ B -> API : nuevo despacho a Lab
+ API -> DB : salida e inicio de nuevo ciclo
+ JL -> API : nueva recepción y asignación
+ ref over JL,QA
+ Repetir trabajo Lab y QA con evidencia nueva
+ (flujo conectado en diagrama 11)
+ end ref
+else OPERATIVO
+ QA -> API : validar y confirmar salida
+ B -> API : validar y confirmar recepción
+ B -> API : validar activo + destino
+ B -> API : confirmar despacho instalación
+ API -> DB : crea IN + SALIDA_BODEGA_TERRENO
+ TT -> API : completar instalación
+ alt instalación operativa
+  API -> DB : INSTALACION_COMPLETADA
+ else instalación fallida
+  API -> DB : INSTALACION_FALLIDA / retorno Bodega
+ end
+end
+@enduml
+```
+
+Principio: cada `validar` y `confirmar` es una operación distinta; la primera no cambia custodia.
+
+## Diagrama renderizado
+
+![Diagrama 08](08_UML_Secuencia_Flujo_Principal_V2.0.svg)
+
+[Fuente PlantUML](08_UML_Secuencia_Flujo_Principal_V2.0.puml) · [Abrir SVG](08_UML_Secuencia_Flujo_Principal_V2.0.svg).
+
+Actualización documental V2.0 del 13-10-2026. Fuente editable y SVG concordantes; no acredita aprobación de fase ni ejecución operacional.

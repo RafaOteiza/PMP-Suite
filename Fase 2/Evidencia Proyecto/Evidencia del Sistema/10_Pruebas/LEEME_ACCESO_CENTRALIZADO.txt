@@ -1,0 +1,127 @@
+﻿PMP SUITE — PRUEBAS CON ACCESO CENTRALIZADO
+18 de octubre de 2026 | Para Rafael, Matías y Luis
+Estado: solo instrucciones, por decisión del responsable; acceso remoto NO habilitado.
+
+MODO ELEGIDO
+Matías y Luis se conectarán desde otras casas mediante una VPN privada.
+Utilizarán la aplicación y la base de datos del computador de Rafael.
+No instalarán PostgreSQL, Backend ni Web. No restaurarán el ZIP de pruebas locales.
+
+Recorrido previsto:
+Navegador de Matías o Luis -> VPN privada -> Web/API del PC de Rafael
+-> PostgreSQL habitual pmp_suite.
+Firebase continúa autenticando las cuentas actuales en la nube.
+
+QUÉ SIGNIFICA PARA LOS DATOS
+Centralizar evita instalaciones y copias en otros equipos. NO convierte la
+aplicación en una simulación ni vuelve de solo lectura todas las cuentas.
+Las consultas mostrarán los mismos datos. Cualquier operación autorizada y
+confirmada por un usuario modificará la base habitual. Las acciones sobre
+cuentas o contraseñas también pueden afectar Firebase.
+Para una primera comprobación sin alterar datos, limitarse a login, navegación,
+consultas y logout. Coordinar por separado los casos que requieran escrituras.
+No usar activos u órdenes protegidos ni forzar estados para completar una prueba.
+Los roles y controles actuales de PMP no se cambian por utilizar VPN.
+
+REQUISITOS DE RAFAEL
+- PC encendido y sin suspensión durante la sesión acordada.
+- Internet, PostgreSQL y Backend disponibles; Web privada habilitada.
+- Credencial Firebase Admin y configuración privada permanecen en este PC.
+- No se requieren copias de credenciales Admin para Matías o Luis.
+- La VPN debe limitar el acceso de los compañeros al servicio PMP autorizado.
+- No compartir PostgreSQL 5432, escritorio remoto, carpetas ni otros servicios.
+- No abrir puertos en el router ni publicar el sistema en Internet.
+
+REQUISITOS DE MATÍAS Y LUIS
+- Navegador e Internet.
+- Cliente de la VPN elegida y acceso individual autorizado por Rafael.
+- Cuenta PMP propia. La identidad de la VPN es independiente de la cuenta PMP;
+  no compartir una cuenta VPN ni entregar contraseñas al configurar la red.
+- URL privada definitiva, que se entregará después de verificar la conexión.
+
+REVISIÓN REALIZADA
+- API habitual en puerto 4000: /api/health respondió correctamente.
+- GET /api/auth/me sin token: respondió 401, sin iniciar sesión de otra persona.
+- Web: VITE_CORE_URL y VITE_API_URL apuntan actualmente a localhost:4000.
+  En el navegador de otro computador, localhost apunta a ESE computador.
+  Por eso no basta con enviar la IP del PC de Rafael: debe prepararse también
+  la conexión del cliente a la API a través del acceso privado.
+- No se encontró Tailscale, WireGuard, ZeroTier u otra VPN de las revisadas en
+  los servicios, ejecutables habituales ni registro de aplicaciones instalado.
+- No se instaló software ni se cambió .env, Firebase, PostgreSQL o el firewall.
+- No se reinició Backend, Web, Metro ni el servicio PostgreSQL.
+- No se han probado todavía conexiones desde los equipos de Matías y Luis.
+
+PROPUESTA DOCUMENTADA PARA UNA FUTURA HABILITACIÓN
+Usar Tailscale como VPN privada y un acceso HTTPS para PMP mediante Tailscale
+Serve. Serve permite publicar un servicio dentro de la red privada; no utilizar
+Funnel, que tiene un propósito de publicación distinto.
+La instalación incorpora un servicio de VPN a Windows. Requiere aprobación
+específica y que Rafael inicie sesión personalmente con su proveedor de identidad.
+No se crearán cuentas ni enviarán invitaciones automáticamente.
+
+PASOS DE HABILITACIÓN
+1. Confirmar autorización para instalar Tailscale, o indicar la VPN alternativa.
+2. Instalar desde el sitio oficial y comprobar el instalador. Rafael completa
+   personalmente el inicio de sesión. No copiar tokens ni claves de acceso VPN
+   a esta carpeta, la guía o el chat.
+3. Identificar la red privada, el equipo anfitrión y las identidades VPN exactas
+   de Matías y Luis. Sus correos de login VPN podrían diferir de los de PMP.
+4. Revisar la política completa de acceso ANTES de incorporar compañeros.
+   Permitir únicamente su acceso HTTPS a PMP. No conservar una regla general
+   que, en paralelo, permita acceder a todos los puertos. Verificar denegación
+   de 5432 y de otros servicios del computador. No modificar permisos de PMP.
+5. Preparar Web y API bajo una dirección privada coherente. Se prefiere HTTPS
+   con Web y /api en el mismo origen. Conservar autenticación Firebase y RBAC.
+   Realizar la preparación por separado, sin sobrescribir la configuración
+   habitual ni reiniciar servicios sin coordinarlo. No publicar carpetas del
+   proyecto, archivos .env, respaldos o la guía de credenciales.
+6. Verificar el acceso privado y la política. Solo después, Rafael autoriza
+   individualmente a Matías y Luis y les entrega la URL definitiva por su canal.
+7. Cada compañero instala el cliente VPN, inicia sesión con su propia identidad,
+   acepta el acceso autorizado y abre la URL privada desde su navegador.
+8. Comprobar login PMP y navegación con su rol. No ejecutar movimientos, cerrar
+   OS ni cambiar cuentas para comprobar únicamente conectividad.
+
+VALIDACIÓN ANTES DE DARLO POR LISTO
+[ ] VPN conectada en el anfitrión y en cada computador remoto.
+[ ] URL HTTPS definitiva identificada; sin uso de localhost en clientes remotos.
+[ ] Web y llamadas API llegan al PC anfitrión, sin errores de red o contenido mixto.
+[ ] Sin token: API protegida rechaza el acceso. Sin VPN/autorización: servicio inaccesible.
+[ ] Matías accede como gerente y Luis como admin, conservando sus permisos actuales.
+[ ] Desde sus equipos, 5432 y los demás puertos no autorizados están bloqueados.
+[ ] No hay publicación pública, reglas amplias inadvertidas ni exposición de archivos.
+[ ] Los resultados de pruebas remotas se registran realmente; no se presumen aprobados.
+[ ] Se acuerda el horario en que Rafael mantendrá el computador disponible.
+
+QUÉ ARCHIVOS USAR
+- Este LEEME define el modo seleccionado.
+- Guia_Instalacion_y_Pruebas_PMP_Suite_V2.0.docx conserva los casos por rol y el
+  registro de hallazgos. Sus pasos de instalación local no se aplican a Matías
+  y Luis cuando usen este acceso centralizado.
+- PMP_Suite_V2.0_Pruebas_Locales_2026-10-18.zip corresponde a la alternativa con
+  bases independientes. Se conserva intacto, pero NO es necesario distribuirlo
+  ni restaurarlo para el modo centralizado. Contiene datos y acceso interno.
+- LEEME_Pruebas_Locales.txt es únicamente la documentación de esa alternativa.
+
+AL FINALIZAR UNA SESIÓN
+Cada participante cierra sesión en PMP y desconecta su VPN. Rafael puede retirar
+el acceso privado concedido cuando terminen las pruebas, conservando los servicios
+habituales. No se eliminarán bases ni se revertirán datos de pruebas automáticamente.
+Desconectar la VPN no revierte operaciones ya confirmadas en PMP.
+
+FUENTES OFICIALES CONSULTADAS EL 18 DE OCTUBRE DE 2026
+Instalación Windows:
+https://tailscale.com/docs/install/windows
+Acceso compartido a equipos:
+https://tailscale.com/docs/features/sharing
+Servicio HTTPS dentro de la red privada:
+https://tailscale.com/docs/features/tailscale-serve
+Políticas de acceso:
+https://tailscale.com/docs/reference/syntax/policy-file
+
+DECISIÓN VIGENTE — 18 DE OCTUBRE DE 2026
+El responsable eligió dejar únicamente las instrucciones, sin instalar la VPN.
+No hay una instalación en curso ni autorización para ejecutar los pasos de
+habilitación. Estos quedan como referencia para una decisión futura.
+No existe todavía una URL privada operativa para Matías y Luis.

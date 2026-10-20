@@ -1,0 +1,41 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+actor "Técnico Terreno" as TT
+participant "Mobile/Web" as UI
+participant API
+participant "Logística" as B
+participant "Jefe Lab" as JL
+participant "Técnico Lab" as TL
+participant QA
+database PostgreSQL as DB
+JL -> API : validar recepción Lab
+JL -> API : confirmar recepción
+API -> DB : RECEPCION_LABORATORIO_CONFIRMADA\nCustodia Lab + inicio SLA del ciclo
+JL -> API : asignar técnico
+API -> DB : tecnico_laboratorio_id
+
+TL -> API : iniciar trabajo
+TL -> API : guardar diagnóstico/intervenciones
+opt PoD requiere repuesto
+ TL -> API : solicitar necesidad
+ API -> DB : solicitud + estado espera
+ B -> API : entregar repuesto
+ API -> DB : descuento stock + evento
+end
+TL -> API : finalizar
+API -> DB : reparación + pruebas + eventos
+
+JL -> API : validar/confirmar salida Lab
+API -> DB : tránsito Bodega
+
+B -> API : validar y confirmar recepción
+B -> API : validar/confirmar salida QA
+API -> DB : ciclo QA
+
+
+@enduml

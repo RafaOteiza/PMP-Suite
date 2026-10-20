@@ -1,0 +1,107 @@
+import assert from 'node:assert/strict';
+import sharp from 'sharp';
+export async function runLabWorkScenarios({pool,call,expect,scan,baseUrl,fixture,users,pst,bus,report}){
+ let sequence=0;
+ const create=async()=>{
+  const series=String(7499000+sequence++);
+  await pool.query("INSERT INTO pmp.validadores(serie,modelo,marca) VALUES($1,'CVB45','Fixture')",[series]);
+  const order=(await pool.query("INSERT INTO pmp.ordenes_servicio(tipo_equipo,validador_serie,falla,estado_id,ubicacion_id,bus_ppu,terminal_id,pst_codigo,tecnico_laboratorio_id) VALUES('VALIDADOR',$1,'Falla QR',2,NULL,$2,$3,$4,$5) RETURNING codigo_os",[series,bus,fixture.terminalId,pst,users.lab.id])).rows[0].codigo_os;
+  await pool.query("INSERT INTO pmp.flujo_eventos(codigo_os,tipo,usuario_id,rol) VALUES($1,'SALIDA_BODEGA_LABORATORIO',$2,'logistica')",[order,users.logistica.id]);
+  await scan(baseUrl,'jefe_laboratorio',series,'LABORATORIO');return {order,series};
+ };
+ const read=async order=>expect(await call('lab','GET','/api/lab/work/'+order),200,'recuperar trabajo');
+ const row=async order=>(await pool.query('SELECT * FROM pmp.ordenes_servicio WHERE codigo_os=$1',[order])).rows[0];
+ const start=async order=>expect(await call('lab','PUT','/api/lab/move',{codigo_os:order,nuevo_estado_id:5}),200,'iniciar trabajo');
+ const close=(order,trabajo,revision=null)=>call('lab','POST','/api/lab/finish',{codigo_os:order,trabajo,revision});
+ const normal=()=>({diagnostico:{resultado:'CONFIRMADA',falla_real:'No lee QR',observacion:'Diagnóstico aislado'},acciones:['Cambio de Repuesto'],pruebas:[{nombre:'Manual',resultado:'APROBADA',observacion:'Conforme'}],resultado:'REPARADO'});
+ const part=(await pool.query("INSERT INTO pmp.repuestos(nombre,categoria,stock,stock_critico) VALUES('Fixture lector QR','VALIDADOR',5,1) RETURNING id")).rows[0].id;
+ const stock=async()=>Number((await pool.query('SELECT stock FROM pmp.repuestos WHERE id=$1',[part])).rows[0].stock);
+ const save=async(order,trabajo,revision=null)=>expect(await call('lab','PUT','/api/lab/work/'+order,{trabajo,revision}),200,'guardar avance');
+ const {order,series}=await create(),before=await row(order);
+ await read(order);assert.deepEqual(await row(order),before,'abrir no escribe');
+ for(const path of ['/api/lab/parts','/api/bodega/repuestos'])expect(await call('lab','GET',path),403,'técnico sin acceso inventario');
+ expect(await call('lab','PUT','/api/bodega/repuestos/'+part+'/stock',{nuevo_stock:999}),403,'técnico sin ajuste stock');
+ for(const actor of ['admin','jefe_laboratorio','logistica','terreno','qa'])expect(await call(actor,'PUT','/api/lab/work/'+order,{trabajo:{}}),403,'sin permiso técnico');
+ await pool.query('UPDATE pmp.ordenes_servicio SET tecnico_laboratorio_id=NULL WHERE codigo_os=$1',[order]);
+ expect(await close(order,normal()),403,'cierre ajeno bloqueado');expect(await call('lab','GET','/api/lab/work/'+order),403,'lectura ajena bloqueada');
+ await pool.query('UPDATE pmp.ordenes_servicio SET tecnico_laboratorio_id=$2 WHERE codigo_os=$1',[order,users.lab.id]);await start(order);
+ const work=normal();work.diagnostico.resultado='DIFERENTE';
+ const beforeSave=await row(order),draft=await save(order,work);
+ assert.deepEqual(await row(order),beforeSave);assert.equal(await stock(),5);assert.deepEqual((await read(order)).trabajo.pruebas,work.pruebas);
+ expect(await call('lab','PUT','/api/lab/work/'+order,{trabajo:work}),409,'revisión obsoleta');
+ assert.equal((await save(order,work,draft.revision)).revision,draft.revision,'avance idéntico sin ruido');
+ for(const nombre of ['QR','Pruebas de Estrés','Otro'])expect(await call('lab','PUT','/api/lab/work/'+order,{revision:draft.revision,trabajo:{...work,pruebas:[{nombre,resultado:'APROBADA'}]}}),422,'método arbitrario bloqueado en backend');
+ expect(await close(order,{...work,repuestos:[{id:part,cantidad:2}]},draft.revision),422,'payload de consumo manipulado rechazado');assert.equal(await stock(),5);
+ expect(await call('lab','POST','/api/lab/request-part',{codigo_os:order,necesidad:'Lector',motivo:'No lee QR'}),422,'sin PoD no solicita');
+ for(const r of await Promise.all([close(order,work,draft.revision),close(order,work,draft.revision)]))expect(r,200,'cierre técnico idempotente');
+ assert.equal(await stock(),5,'cierre normal no consume');assert.equal((await row(order)).estado_id,10);assert.equal((await row(order)).ubicacion_id,2);
+ assert.ok(expect(await call('lab','GET','/api/lab/completed'),200,'Listos para QA').some(o=>o.codigo_os===order));
+ assert.equal((await pool.query('SELECT count(*) FROM pmp.registro_reparaciones WHERE codigo_os=$1',[order])).rows[0].count,'1');
+ const history=expect(await call('logistica','GET','/api/bridge/activos/VALIDADOR/'+series+'/historial'),200,'historial');
+ for(const type of ['LAB_TRABAJO_INICIADO','LAB_AVANCE_GUARDADO','LAB_DIAGNOSTICO_CONFIRMADO','LAB_REPARACION_FINALIZADA','LAB_LISTO_QA'])assert.ok(history.eventos.some(e=>e.tipo===type));
+ const nff=await create();await start(nff.order);
+ expect(await close(nff.order,{diagnostico:{resultado:'NFF',observacion:'No reproduce falla'},resultado:'NFF',pruebas:[{nombre:'Test MK',resultado:'APROBADA'}]}),200,'NFF sin inventario');
+ const photo={origen:'ARCHIVO',base64:(await sharp({create:{width:12,height:12,channels:3,background:'#abcdef'}}).png().toBuffer()).toString('base64')};
+ const podWork={diagnostico:{resultado:'POD'},resultado:'POD',pruebas:[{nombre:'Test MK',resultado:'APROBADA',observacion:''}],pod:{categoria:'ROTURA',observacion:'Impacto en cubierta',fotografias:[photo]}};
+ const waiting=await create();await start(waiting.order);
+ const incomplete=await save(waiting.order,{...podWork,pod:{...podWork.pod,fotografias:[]}});
+ const requestBody={codigo_os:waiting.order,necesidad:'Lector QR dañado',motivo:'Daño por impacto impide continuar'};
+ expect(await call('lab','POST','/api/lab/request-part',requestBody),422,'PoD incompleto bloquea solicitud');
+ const podDraft=await save(waiting.order,podWork,incomplete.revision);
+ expect(await call('lab','POST','/api/lab/request-part',{...requestBody,repuesto_id:part,cantidad:2}),422,'laboratorio no decide inventario');
+ expect(await call('lab','POST','/api/lab/request-part',requestBody),200,'solicitud PoD por descripción');assert.equal(await stock(),5);assert.equal((await row(waiting.order)).estado_id,9);
+ expect(await call('lab','POST','/api/lab/request-part',requestBody),200,'reintento solicitud');
+ assert.equal((await read(waiting.order)).pod_contexto.categoria,'ROTURA','solicitud conserva contexto PoD registrado');
+ const reqs=(await read(waiting.order)).solicitudes;assert.equal(reqs.length,1);assert.equal(reqs[0].repuesto_solicitado,requestBody.necesidad);
+ assert.deepEqual((await read(waiting.order)).trabajo.pruebas,podWork.pruebas);
+ const deliveryPath='/api/bodega/solicitudes/'+reqs[0].id+'/entregar';
+ expect(await call('lab','PUT',deliveryPath,{repuesto_id:part,cantidad:2}),403,'no atender solicitud propia');
+ expect(await close(waiting.order,podWork,podDraft.revision),409,'espera bloquea cierre');
+ // Defense independent from state display: pending request blocks a manipulated state 5 too.
+ await pool.query('UPDATE pmp.ordenes_servicio SET estado_id=5 WHERE codigo_os=$1',[waiting.order]);
+ expect(await close(waiting.order,podWork,podDraft.revision),409,'pendiente real bloquea aun en 5');
+ await pool.query('UPDATE pmp.ordenes_servicio SET estado_id=9 WHERE codigo_os=$1',[waiting.order]);
+ for(const cantidad of [0,-1])expect(await call('logistica','PUT',deliveryPath,{repuesto_id:part,cantidad}),422,'cantidad inválida');
+ expect(await call('logistica','PUT',deliveryPath,{repuesto_id:part,cantidad:6}),409,'sin stock suficiente');
+ assert.equal(await stock(),5);assert.equal((await row(waiting.order)).estado_id,9);
+ for(const r of await Promise.all([call('logistica','PUT',deliveryPath,{repuesto_id:part,cantidad:2}),call('logistica','PUT',deliveryPath,{repuesto_id:part,cantidad:2})]))expect(r,200,'entrega concurrente idempotente');
+ assert.equal(await stock(),3);assert.equal((await row(waiting.order)).estado_id,5);
+ const movements=(await pool.query("SELECT * FROM pmp.flujo_eventos WHERE tipo='LOGISTICA_ENTREGA_REPUESTO' AND codigo_os=$1",[waiting.order])).rows;
+ assert.equal(movements.length,1);assert.equal(movements[0].usuario_id,users.logistica.id);assert.equal(movements[0].metadata.cantidad,2);assert.equal(movements[0].metadata.stock_final,3);
+ expect(await close(waiting.order,podWork,podDraft.revision),200,'cierre PoD tras entrega');assert.equal(await stock(),3,'no doble consumo al cerrar');assert.ok((await row(waiting.order)).codigo_os.startsWith('MV-'));
+ expect(await call('logistica','PUT',deliveryPath,{repuesto_id:part,cantidad:2}),200,'entrega repetida no reabre cierre');assert.equal((await row(waiting.order)).estado_id,10);
+ expect(await call('logistica','PUT',deliveryPath,{repuesto_id:part,cantidad:1}),409,'reintento incompatible');
+ // PoD known from the real withdrawal event, not inferred from OS prefix.
+ const known=await create();await start(known.order);
+ await pool.query("INSERT INTO pmp.flujo_eventos(codigo_os,tipo,usuario_id,rol,metadata) VALUES($1,'RETIRO_TERRENO_CONFIRMADO',$2,'tecnico_terreno',$3)",[known.order,users.terreno.id,JSON.stringify({pod:true,categoria_pod:'ROTURA',observacion:'Daño detectado en retiro',fotografias:[{...photo,origen:'CAMARA'}]})]);
+ assert.ok((await read(known.order)).pod_contexto);
+ expect(await call('lab','POST','/api/lab/request-part',{...requestBody,codigo_os:known.order}),200,'PoD registrado en terreno habilita contexto sin renombrar');
+ // Insufficient stock under contention between two different pending requests.
+ const competitor=await create();await start(competitor.order);await save(competitor.order,podWork);
+ expect(await call('lab','POST','/api/lab/request-part',{...requestBody,codigo_os:competitor.order}),200,'segunda solicitud');
+ const competitors=await Promise.all([known.order,competitor.order].map(async code=>{
+  const req=(await read(code)).solicitudes[0];return call('logistica','PUT','/api/bodega/solicitudes/'+req.id+'/entregar',{repuesto_id:part,cantidad:2});
+ }));
+ assert.deepEqual(competitors.map(r=>r.status).sort(),[200,409]);assert.equal(await stock(),1,'no sobreventa');
+ // Preserve old drafts/tests and already delivered requests without retrospective deductions.
+ const legacy=await create();await start(legacy.order);
+ const legacyWork={...normal(),repuestos:[{id:part,cantidad:1}],pruebas:[{nombre:'Prueba QR antigua',resultado:'RECHAZADA',observacion:'Registro histórico'}]};
+ const oldEvent=(await pool.query("INSERT INTO pmp.flujo_eventos(codigo_os,tipo,usuario_id,rol,metadata) VALUES($1,'LAB_AVANCE_GUARDADO',$2,'tecnico_laboratorio',$3) RETURNING id,metadata",[legacy.order,users.lab.id,JSON.stringify({ciclo:(await read(legacy.order)).ciclo,trabajo:legacyWork})])).rows[0];
+ const restored=await read(legacy.order);assert.equal(restored.trabajo.repuestos,undefined);assert.deepEqual(restored.trabajo.pruebas,[]);assert.equal(restored.legado.pruebas[0].resultado,'RECHAZADA');
+ const revised=await save(legacy.order,{...restored.trabajo,pruebas:[{nombre:'Manual',resultado:''}]},restored.revision);
+ expect(await close(legacy.order,{...restored.trabajo,pruebas:[{nombre:'Manual',resultado:''}]},revised.revision),422,'pendiente no cierra');
+ assert.deepEqual((await pool.query('SELECT metadata FROM pmp.flujo_eventos WHERE id=$1',[oldEvent.id])).rows[0].metadata,oldEvent.metadata);
+ const oldRequest=(await pool.query("INSERT INTO pmp.solicitudes_repuestos(codigo_os,solicitado_por,repuesto_solicitado,estado,fecha_despacho) VALUES($1,$2,'Entrega histórica','DESPACHADA',now()) RETURNING id",[legacy.order,users.lab.id])).rows[0];
+ expect(await call('logistica','PUT','/api/bodega/solicitudes/'+oldRequest.id+'/entregar',{}),409,'legacy entregada sin auditoría de movimiento no se acepta como reintento');
+ assert.equal(await stock(),1);
+ // Pending legacy requests can be resolved explicitly now by Bodega, without reclassifying their old context.
+ const oldPending=(await pool.query("INSERT INTO pmp.solicitudes_repuestos(codigo_os,solicitado_por,repuesto_solicitado) VALUES($1,$2,'Solicitud anterior') RETURNING id",[legacy.order,users.lab.id])).rows[0];
+ await pool.query('UPDATE pmp.ordenes_servicio SET estado_id=9 WHERE codigo_os=$1',[legacy.order]);
+ expect(await call('logistica','PUT','/api/bodega/solicitudes/'+oldPending.id+'/entregar',{repuesto_id:part,cantidad:1}),200,'entrega legacy pendiente explícita');
+ assert.equal(await stock(),0);
+ const historicalClosure=await create();
+ const historicalPayload={...legacyWork};
+ await pool.query("INSERT INTO pmp.flujo_eventos(codigo_os,tipo,usuario_id,rol,metadata) VALUES($1,'LAB_REPARACION_FINALIZADA',$2,'tecnico_laboratorio',$3)",[historicalClosure.order,users.lab.id,JSON.stringify({ciclo:(await read(historicalClosure.order)).ciclo,trabajo:historicalPayload,repuestos:[{id:part,cantidad:1,stock_anterior:1,stock_final:0}]})]);
+ expect(await close(historicalClosure.order,historicalPayload),200,'cierre histórico no se reejecuta');assert.equal(await stock(),0);
+ report.steps.push({action:'Laboratorio/Bodega: métodos fijos, sin inventario técnico, PoD documentado, solicitud descriptiva, entrega exclusiva y concurrente con consumo único, cierre sin consumo y preservación legacy',ok:true});
+}

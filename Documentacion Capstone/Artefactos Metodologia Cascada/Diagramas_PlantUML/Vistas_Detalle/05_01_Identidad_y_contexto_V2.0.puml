@@ -1,0 +1,65 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+hide circle
+skinparam linetype ortho
+entity usuarios {
+  * id : uuid
+  --
+  nombre
+  apellido
+  correo
+  rol
+  activo
+  firebase_uid
+}
+entity validadores {
+  * serie
+  --
+  modelo
+  marca
+  amid
+  origen_registro
+  fecha_ingreso
+  registrado_por
+}
+entity consolas {
+  * serie
+  --
+  modelo
+  marca
+  origen_registro
+  fecha_ingreso
+  registrado_por
+}
+entity terminales {
+  * id
+  --
+  nombre
+}
+entity pst {
+  * codigo
+  --
+  nombre
+}
+entity casos_operacionales {
+ * id
+ --
+ terminal_id
+ pst_codigo
+ creado_por
+}
+usuarios |o--o{ validadores
+usuarios |o--o{ consolas
+usuarios ||--o{ casos_operacionales : creado_por
+terminales ||--o{ casos_operacionales
+pst ||--o{ casos_operacionales
+legend bottom
+Vista temática complementaria. Relaciones externas
+a esta vista permanecen en el ERD general.
+endlegend
+@enduml

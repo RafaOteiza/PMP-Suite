@@ -1,0 +1,44 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+left to right direction
+actor Gerente
+actor Admin
+actor "Jefe Laboratorio" as JL
+actor Logistica
+rectangle "PMP Suite V2.0" {
+ usecase "Dashboard ejecutivo" as U01
+ usecase "Administrar usuarios" as U02
+ usecase "Consultar trazabilidad" as U19
+ usecase "Consultar analítica" as U21
+ usecase "Consultar perfil y cambiar\ncontraseña / tema propios" as U22
+ usecase "Exportar reportes autorizados" as U23
+}
+Gerente --> U01
+Gerente --> U19
+Gerente --> U21
+Admin --> U01
+Admin --> U02
+Admin --> U19
+Admin --> U21
+Logistica --> U19
+JL --> U19
+Admin --> U22
+JL --> U22
+Logistica --> U22
+JL --> U21
+Logistica --> U21
+Admin --> U23
+Gerente --> U23
+JL --> U23
+Logistica --> U23
+Gerente --> U22
+legend bottom
+Consultar y exportar no habilita movimientos.
+Aplican autorización y alcance vigentes.
+endlegend
+@enduml

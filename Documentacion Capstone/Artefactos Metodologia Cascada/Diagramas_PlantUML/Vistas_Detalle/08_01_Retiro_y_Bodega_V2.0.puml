@@ -1,0 +1,37 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+actor "Técnico Terreno" as TT
+participant "Mobile/Web" as UI
+participant API
+participant "Logística" as B
+participant "Jefe Lab" as JL
+participant "Técnico Lab" as TL
+participant QA
+database PostgreSQL as DB
+TT -> UI : reportar falla
+UI -> API : POST requerimiento/OS
+API -> DB : caso + OS + evento
+
+B -> API : asignar retiro
+API -> DB : técnico Terreno
+
+TT -> API : validar identidad retiro
+API -> DB : evidencia
+TT -> API : confirmar retiro
+API -> DB : RETIRO_TERRENO_CONFIRMADO
+
+B -> API : validar recepción Bodega
+B -> API : confirmar recepción
+API -> DB : custodia Bodega
+
+B -> API : validar salida a Lab
+B -> API : confirmar salida
+API -> DB : SALIDA_BODEGA_LABORATORIO\nEn tránsito; sin carga asignable ni SLA
+
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam ArrowColor #1565C0
+skinparam shadowing false
+start
+:Alta de maestro por Logística;
+:ALTA_ACTIVO sin OS ni disponibilidad;
+:Capturar y validar presencia en Bodega;
+if (¿Validación correcta?) then (Sí)
+ :Confirmar recepción inicial;
+ :RECEPCION_INICIAL y HABILITADO_INSTALACION;
+ :Origen de stock identificado por evento;
+else (No)
+ :Bloquear recepción; maestro no disponible;
+endif
+stop
+@enduml
